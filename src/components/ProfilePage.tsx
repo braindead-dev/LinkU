@@ -5,21 +5,25 @@ import PostCard from '@/components/PostCard';
 import UserCard from '@/components/UserCard';
 import {
   MapPinIcon,
-  LinkIcon,
   CalendarIcon,
 } from '@heroicons/react/24/outline';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { Database } from '@/types/database.types';
 
 type ProfilePageProps = {
-  params: {
+  params: Promise<{
     username: string;
-  };
+  }>;
+};
+
+type Post = Database['public']['Tables']['posts']['Row'] & {
+  profiles: Database['public']['Tables']['profiles']['Row'];
 };
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const supabase = await createClient();
-  const { username } = params;
+  const { username } = await params;
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -77,14 +81,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         {profile.bio && <p className="mt-4">{profile.bio}</p>}
 
         <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500">
-          <div className="flex items-center gap-1">
-            <MapPinIcon className="h-4 w-4" />
-            <span>Cupertino, CA</span>
-          </div>
-          <a href="#" className="flex items-center gap-1 text-blue-500 hover:underline">
-            <LinkIcon className="h-4 w-4" />
-            <span>henr.ee</span>
-          </a>
+          {profile.location && (
+            <div className="flex items-center gap-1">
+              <MapPinIcon className="h-4 w-4" />
+              <span>{profile.location}</span>
+            </div>
+          )}
           <div className="flex items-center gap-1">
             <CalendarIcon className="h-4 w-4" />
             <span>Joined {new Date(profile.created_at).toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
@@ -111,7 +113,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       </div>
       
       <div className="pb-28">
-        {profile.posts.sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map(post => (
+        {profile.posts.sort((a: Post, b: Post) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map((post: Post) => (
           <PostCard key={post.id} post={{...post, profiles: profile}} />
         ))}
       </div>
