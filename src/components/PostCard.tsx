@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { FC } from "react";
 
-interface TweetCardProps {
+interface PostCardProps {
   name: string;
   handle: string;
   content: string;
@@ -9,9 +9,9 @@ interface TweetCardProps {
 }
 
 /**
- * TweetCard – displays a single tweet/post.
+ * PostCard – displays a single post.
  */
-const TweetCard: FC<TweetCardProps> = ({ name, handle, content, image }) => (
+const PostCard: FC<PostCardProps> = ({ name, handle, content, image }) => (
   <article className="flex gap-4 p-4 border-b border-gray-200 dark:border-neutral-800">
     {/* Avatar */}
     <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" />
@@ -23,7 +23,7 @@ const TweetCard: FC<TweetCardProps> = ({ name, handle, content, image }) => (
       <p className="mt-1 whitespace-pre-wrap text-sm/relaxed">{content}</p>
       {image && (
         <div className="mt-3 overflow-hidden rounded-2xl border border-gray-200 dark:border-neutral-800">
-          <Image src={image} alt="tweet image" width={500} height={300} className="w-full h-auto" />
+          <Image src={image} alt="post image" width={500} height={300} className="w-full h-auto" />
         </div>
       )}
       <footer className="mt-3 text-sm text-gray-500">533  •  18K  •  2.5M</footer>
@@ -31,4 +31,4 @@ const TweetCard: FC<TweetCardProps> = ({ name, handle, content, image }) => (
   </article>
 );
 
-export default TweetCard; 
+export default PostCard; 

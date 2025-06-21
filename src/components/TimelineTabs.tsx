@@ -1,15 +1,18 @@
 'use client';
 import { FC, useState } from "react";
-import TweetComposer from "@/components/TweetComposer";
-import TweetCard from "@/components/TweetCard";
+import PostComposer from "@/components/PostComposer";
+import PostCard from "@/components/PostCard";
+
+const TABS = ["For you", "Following"] as const;
+type Tab = typeof TABS[number];
 
 /**
  * TabNav – internal component for switching between timeline tabs.
  */
 const TabNav: FC<{
-  tabs: readonly string[];
+  tabs: readonly Tab[];
   active: string;
-  onChange: (t: string) => void;
+  onChange: (t: Tab) => void;
 }> = ({ tabs, active, onChange }) => (
   <nav className="flex border-b border-gray-200 dark:border-neutral-800 sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur">
     {tabs.map((tab) => (
@@ -30,15 +33,14 @@ const TabNav: FC<{
  * TimelineTabs – renders tab navigation and timeline content.
  */
 const TimelineTabs: FC = () => {
-  const tabs = ["For you", "Following"] as const;
-  const [active, setActive] = useState<typeof tabs[number]>(tabs[0]);
+  const [active, setActive] = useState<Tab>(TABS[0]);
 
   return (
     <section>
-      <TabNav tabs={tabs} active={active} onChange={setActive} />
-      <TweetComposer />
+      <TabNav tabs={TABS} active={active} onChange={setActive} />
+      <PostComposer />
       {[...Array(3)].map((_, idx) => (
-        <TweetCard
+        <PostCard
           key={idx}
           name="Theo - t3.gg"
           handle="theo"

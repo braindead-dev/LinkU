@@ -2,9 +2,9 @@
 import { FC } from "react";
 
 /**
- * TweetComposer – input area to create a new post.
+ * PostComposer – input area to create a new post.
  */
-const TweetComposer: FC = () => (
+const PostComposer: FC = () => (
   <div className="flex gap-4 p-4 border-b border-gray-200 dark:border-neutral-800">
     {/* Avatar placeholder */}
     <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" />
@@ -24,4 +24,4 @@ const TweetComposer: FC = () => (
   </div>
 );
 
-export default TweetComposer; 
+export default PostComposer; 
