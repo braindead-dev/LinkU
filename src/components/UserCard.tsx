@@ -1,6 +1,6 @@
 'use client';
 import { FC, useState, useEffect, useCallback } from "react";
-import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
 
@@ -70,17 +70,12 @@ const UserCard: FC<UserCardProps> = ({ user, currentUserId }) => {
   return (
     <div className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-neutral-900/50 transition-colors">
       <div className="flex items-center gap-3">
-        {user.avatar_url ? (
-          <Image
-            src={user.avatar_url}
-            alt={`${user.username} avatar`}
-            width={40}
-            height={40}
-            className="rounded-full"
-          />
-        ) : (
-          <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600" />
-        )}
+        <Avatar className="h-10 w-10 shrink-0">
+          <AvatarImage src={user.avatar_url ?? undefined} alt={`${user.username} avatar`} />
+          <AvatarFallback>
+            {user.full_name?.charAt(0).toUpperCase() || user.username.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
         <div>
           <h3 className="font-semibold">{user.full_name || user.username}</h3>
           <p className="text-sm text-gray-500">@{user.username}</p>
