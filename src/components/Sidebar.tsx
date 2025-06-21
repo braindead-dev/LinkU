@@ -37,7 +37,7 @@ const Sidebar: FC<SidebarProps> = ({ profile }) => {
       <ProfileSection profile={profile} onSignOut={handleSignOut} />
       {/* Future navigation items can be added below */}
       <nav className="flex flex-col gap-4 text-lg font-medium">
-        <SidebarLink label="Home" />
+        <SidebarLink label="Home" href="/" />
         <SidebarLink label="Messages" />
       </nav>
     </aside>
@@ -82,10 +82,21 @@ const ProfileSection: FC<{ profile: Profile | null; onSignOut: () => void }> = (
 
 interface SidebarLinkProps {
   label: string;
+  href?: string;
 }
 
-const SidebarLink: FC<SidebarLinkProps> = ({ label }) => (
-  <a href="#" className="hover:underline">
-    {label}
-  </a>
-); 
+const SidebarLink: FC<SidebarLinkProps> = ({ label, href }) => {
+  if (href) {
+    return (
+      <Link href={href} className="hover:underline">
+        {label}
+      </Link>
+    );
+  }
+  
+  return (
+    <a href="#" className="hover:underline">
+      {label}
+    </a>
+  );
+}; 
