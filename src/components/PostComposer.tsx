@@ -1,6 +1,6 @@
 'use client';
 import { FC, useState } from "react";
-import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
@@ -45,18 +45,12 @@ const PostComposer: FC<PostComposerProps> = ({ profile }) => {
 
   return (
     <div className="flex gap-4 p-4 border-b border-gray-200 dark:border-neutral-800">
-      {/* Avatar */}
-      {profile?.avatar_url ? (
-        <Image
-          src={profile.avatar_url}
-          alt="Profile"
-          width={40}
-          height={40}
-          className="rounded-full shrink-0"
-        />
-      ) : (
-        <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" />
-      )}
+      <Avatar className="h-10 w-10 shrink-0">
+        <AvatarImage src={profile?.avatar_url ?? undefined} alt="Profile" />
+        <AvatarFallback>
+          {profile?.full_name?.charAt(0).toUpperCase() || profile?.username?.charAt(0).toUpperCase() || "U"}
+        </AvatarFallback>
+      </Avatar>
 
       <div className="flex-1">
         <textarea

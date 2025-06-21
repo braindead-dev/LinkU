@@ -1,3 +1,4 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import { FC } from "react";
 import { Database } from "@/types/database.types";
@@ -29,18 +30,12 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
 
   return (
     <article className="flex gap-4 p-4 border-b border-gray-200 dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-900/50 transition-colors">
-      {/* Avatar */}
-      {post.profiles.avatar_url ? (
-        <Image
-          src={post.profiles.avatar_url}
-          alt={`${post.profiles.username} avatar`}
-          width={40}
-          height={40}
-          className="rounded-full shrink-0"
-        />
-      ) : (
-        <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" />
-      )}
+      <Avatar className="h-10 w-10 shrink-0">
+        <AvatarImage src={post.profiles.avatar_url ?? undefined} alt={`${post.profiles.username} avatar`} />
+        <AvatarFallback>
+          {post.profiles.full_name?.charAt(0).toUpperCase() || post.profiles.username.charAt(0).toUpperCase()}
+        </AvatarFallback>
+      </Avatar>
       
       <div className="flex-1 min-w-0">
         <header className="flex gap-2 items-baseline">
