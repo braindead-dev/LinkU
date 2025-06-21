@@ -78,9 +78,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           <p className="text-gray-500">@{profile.username}</p>
         </div>
 
-        {profile.bio && <p className="mt-4">{profile.bio}</p>}
+        {profile.bio && <p className="mt-2">{profile.bio}</p>}
 
-        <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500">
+        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500">
           {profile.location && (
             <div className="flex items-center gap-1">
               <MapPinIcon className="h-4 w-4" />
@@ -93,7 +93,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           </div>
         </div>
 
-        <div className="mt-4 flex gap-4 text-sm">
+        <div className="mt-2 flex gap-4 text-sm">
           <p>
             <span className="font-bold">{profile.following[0].count}</span> Following
           </p>
