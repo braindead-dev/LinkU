@@ -48,6 +48,9 @@ ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public profiles are viewable by everyone" ON profiles
   FOR SELECT USING (true);
 
+CREATE POLICY "Users can insert own profile" ON profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
 CREATE POLICY "Users can update own profile" ON profiles
   FOR UPDATE USING (auth.uid() = id);
 
@@ -82,6 +85,16 @@ BEGIN
     new.raw_user_meta_data->>'full_name'
   );
   RETURN new;
+EXCEPTION
+  WHEN unique_violation THEN
+    -- If username already exists, append a random number
+    INSERT INTO public.profiles (id, username, full_name)
+    VALUES (
+      new.id,
+      COALESCE(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1)) || '_' || floor(random() * 10000)::text,
+      new.raw_user_meta_data->>'full_name'
+    );
+    RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

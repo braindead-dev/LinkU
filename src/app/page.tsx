@@ -8,18 +8,59 @@ import MessagesTab from "@/components/MessagesTab";
 export default async function Home() {
   const supabase = await createClient();
   
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
   
-  if (!user) {
+  if (!user || userError) {
     redirect('/auth');
   }
 
   // Fetch user profile
-  const { data: profile } = await supabase
+  let { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single();
+
+  // If profile doesn't exist, create one
+  if (!profile && user.email) {
+    const baseUsername = user.user_metadata?.username || user.email.split('@')[0];
+    const fullName = user.user_metadata?.full_name || '';
+    
+    // Try to create profile with base username
+    const { data: newProfile, error: createError } = await supabase
+      .from('profiles')
+      .insert({
+        id: user.id,
+        username: baseUsername,
+        full_name: fullName,
+      })
+      .select()
+      .single();
+    
+    // If username already exists, try with a random suffix
+    if (createError?.code === '23505') { // Unique violation
+      const uniqueUsername = `${baseUsername}_${Math.floor(Math.random() * 10000)}`;
+      const { data: retryProfile, error: retryError } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          username: uniqueUsername,
+          full_name: fullName,
+        })
+        .select()
+        .single();
+      
+      if (!retryError) {
+        profile = retryProfile;
+      } else {
+        console.error('Error creating profile with unique username:', retryError);
+      }
+    } else if (!createError) {
+      profile = newProfile;
+    } else {
+      console.error('Error creating profile:', createError);
+    }
+  }
 
   return (
     <div className="flex max-w-7xl mx-auto">
