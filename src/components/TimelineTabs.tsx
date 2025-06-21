@@ -2,9 +2,15 @@
 import { FC, useState } from "react";
 import PostComposer from "@/components/PostComposer";
 import PostCard from "@/components/PostCard";
+import { Database } from "@/types/database.types";
 
 const TABS = ["For you", "Following"] as const;
 type Tab = typeof TABS[number];
+type Profile = Database['public']['Tables']['profiles']['Row'];
+
+interface TimelineTabsProps {
+  profile?: Profile | null;
+}
 
 /**
  * TabNav – internal component for switching between timeline tabs.
@@ -32,13 +38,13 @@ const TabNav: FC<{
 /**
  * TimelineTabs – renders tab navigation and timeline content.
  */
-const TimelineTabs: FC = () => {
+const TimelineTabs: FC<TimelineTabsProps> = ({ profile }) => {
   const [active, setActive] = useState<Tab>(TABS[0]);
 
   return (
     <section>
       <TabNav tabs={TABS} active={active} onChange={setActive} />
-      <PostComposer />
+      <PostComposer profile={profile} />
       {[...Array(3)].map((_, idx) => (
         <PostCard
           key={idx}

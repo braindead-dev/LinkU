@@ -1,13 +1,31 @@
 'use client';
 import { FC } from "react";
+import Image from "next/image";
+import { Database } from "@/types/database.types";
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
+
+interface PostComposerProps {
+  profile?: Profile | null;
+}
 
 /**
  * PostComposer – input area to create a new post.
  */
-const PostComposer: FC = () => (
+const PostComposer: FC<PostComposerProps> = ({ profile }) => (
   <div className="flex gap-4 p-4 border-b border-gray-200 dark:border-neutral-800">
-    {/* Avatar placeholder */}
-    <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" />
+    {/* Avatar */}
+    {profile?.avatar_url ? (
+      <Image
+        src={profile.avatar_url}
+        alt="Profile"
+        width={40}
+        height={40}
+        className="rounded-full shrink-0"
+      />
+    ) : (
+      <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 shrink-0" />
+    )}
 
     <div className="flex-1">
       <input
