@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
+import Link from "next/link";
 import { FC } from "react";
 import { Database } from "@/types/database.types";
 
@@ -30,19 +31,23 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
 
   return (
     <article className="flex gap-4 p-4 border-b border-gray-200 dark:border-neutral-800 hover:bg-gray-50 dark:hover:bg-neutral-900/50 transition-colors">
-      <Avatar className="h-10 w-10 shrink-0">
-        <AvatarImage src={post.profiles.avatar_url ?? undefined} alt={`${post.profiles.username} avatar`} />
-        <AvatarFallback>
-          {post.profiles.full_name?.charAt(0).toUpperCase() || post.profiles.username.charAt(0).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
+      <Link href={`/${post.profiles.username}`}>
+        <Avatar className="h-10 w-10 shrink-0">
+          <AvatarImage src={post.profiles.avatar_url ?? undefined} alt={`${post.profiles.username} avatar`} />
+          <AvatarFallback>
+            {post.profiles.full_name?.charAt(0).toUpperCase() || post.profiles.username.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+      </Link>
       
       <div className="flex-1 min-w-0">
         <header className="flex gap-2 items-baseline">
-          <h3 className="font-semibold truncate">
+          <Link href={`/${post.profiles.username}`} className="font-semibold truncate hover:underline">
             {post.profiles.full_name || post.profiles.username}
-          </h3>
-          <span className="text-sm text-gray-500 truncate">@{post.profiles.username}</span>
+          </Link>
+          <Link href={`/${post.profiles.username}`} className="text-sm text-gray-500 truncate">
+            @{post.profiles.username}
+          </Link>
           <span className="text-sm text-gray-500">·</span>
           <time className="text-sm text-gray-500">{formatDate(post.created_at)}</time>
         </header>

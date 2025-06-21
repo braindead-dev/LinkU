@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Link from "next/link";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -66,8 +67,10 @@ const ProfileSection: FC<{ profile: Profile | null; onSignOut: () => void }> = (
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" side="bottom" align="start">
-        <DropdownMenuItem>
-          Profile
+        <DropdownMenuItem asChild>
+          <Link href={`/${profile.username}`}>
+            Profile
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={onSignOut}>
           Sign out
