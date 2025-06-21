@@ -32,7 +32,7 @@ export default async function Page({ params }: PageProps) {
       <Sidebar profile={profile} />
 
       <main className="flex-1 min-h-screen border-x border-gray-200 dark:border-neutral-800">
-        <ProfilePage params={params} />
+        <ProfilePage params={Promise.resolve(params)} />
       </main>
 
       <aside className="hidden xl:block w-96 space-y-4">

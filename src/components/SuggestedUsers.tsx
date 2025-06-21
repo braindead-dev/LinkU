@@ -57,7 +57,7 @@ const SuggestedUsers: FC<SuggestedUsersProps> = ({ currentUserId }) => {
   return (
     <div className="bg-gray-50 dark:bg-neutral-900 rounded-2xl overflow-hidden">
       <h2 className="text-xl font-bold p-4 pb-0">Who to follow</h2>
-      <div className="divide-y divide-gray-200 dark:divide-neutral-800">
+      <div className="py-2">
         {users.map((user) => (
           <UserCard key={user.id} user={user} currentUserId={currentUserId} />
         ))}

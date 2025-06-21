@@ -3,6 +3,7 @@ import { FC, useState, useEffect, useCallback } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
+import Link from "next/link";
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -68,8 +69,8 @@ const UserCard: FC<UserCardProps> = ({ user, currentUserId }) => {
   };
 
   return (
-    <div className="flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-neutral-900/50 transition-colors">
-      <div className="flex items-center gap-3">
+    <div className="flex items-center justify-between px-4 py-2 hover:bg-gray-50 dark:hover:bg-neutral-900/50 transition-colors">
+      <Link href={`/${user.username}`} className="flex items-center gap-3 flex-1 hover:bg-gray-50 dark:hover:bg-neutral-900/50 transition-colors rounded-lg p-2 -m-2">
         <Avatar className="h-10 w-10 shrink-0">
           <AvatarImage src={user.avatar_url ?? undefined} alt={`${user.username} avatar`} />
           <AvatarFallback>
@@ -80,7 +81,7 @@ const UserCard: FC<UserCardProps> = ({ user, currentUserId }) => {
           <h3 className="font-semibold">{user.full_name || user.username}</h3>
           <p className="text-sm text-gray-500">@{user.username}</p>
         </div>
-      </div>
+      </Link>
       
       {currentUserId && currentUserId !== user.id && (
         <button
