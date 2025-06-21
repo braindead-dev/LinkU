@@ -110,7 +110,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         </nav>
       </div>
       
-      <div>
+      <div className="pb-28">
         {profile.posts.sort((a,b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map(post => (
           <PostCard key={post.id} post={{...post, profiles: profile}} />
         ))}
