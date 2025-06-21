@@ -22,6 +22,16 @@ CREATE TABLE posts (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
+-- Create following table
+CREATE TABLE following (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  follower_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  following_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  UNIQUE(follower_id, following_id),
+  CHECK (follower_id != following_id)
+);
+
 -- Create messages table
 CREATE TABLE messages (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -35,6 +45,8 @@ CREATE TABLE messages (
 -- Create indexes for better performance
 CREATE INDEX idx_posts_user_id ON posts(user_id);
 CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
+CREATE INDEX idx_following_follower_id ON following(follower_id);
+CREATE INDEX idx_following_following_id ON following(following_id);
 CREATE INDEX idx_messages_sender_id ON messages(sender_id);
 CREATE INDEX idx_messages_recipient_id ON messages(recipient_id);
 CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
@@ -42,6 +54,7 @@ CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
 -- Enable Row Level Security
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE following ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
 -- Profiles policies
@@ -66,6 +79,16 @@ CREATE POLICY "Users can update own posts" ON posts
 
 CREATE POLICY "Users can delete own posts" ON posts
   FOR DELETE USING (auth.uid() = user_id);
+
+-- Following policies
+CREATE POLICY "Following relationships are viewable by everyone" ON following
+  FOR SELECT USING (true);
+
+CREATE POLICY "Users can follow others" ON following
+  FOR INSERT WITH CHECK (auth.uid() = follower_id);
+
+CREATE POLICY "Users can unfollow" ON following
+  FOR DELETE USING (auth.uid() = follower_id);
 
 -- Messages policies
 CREATE POLICY "Users can view own messages" ON messages

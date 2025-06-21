@@ -4,6 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import TimelineTabs from "@/components/TimelineTabs";
 import SearchBar from "@/components/SearchBar";
 import MessagesTab from "@/components/MessagesTab";
+import SuggestedUsers from "@/components/SuggestedUsers";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -72,8 +73,11 @@ export default async function Home() {
       </main>
 
       {/* Right column */}
-      <aside className="hidden xl:block w-96">
+      <aside className="hidden xl:block w-96 space-y-4">
         <SearchBar />
+        <div className="px-4">
+          <SuggestedUsers currentUserId={user.id} />
+        </div>
       </aside>
 
       <MessagesTab />
