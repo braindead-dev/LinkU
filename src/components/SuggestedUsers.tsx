@@ -19,27 +19,27 @@ const SuggestedUsers: FC<SuggestedUsersProps> = ({ currentUserId }) => {
   const supabase = createClient();
 
   useEffect(() => {
+    const fetchSuggestedUsers = async () => {
+      try {
+        // For now, just get all users except the current user
+        // In a real app, you'd have a more sophisticated recommendation algorithm
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .neq('id', currentUserId || '')
+          .limit(5);
+
+        if (error) throw error;
+        setUsers(data || []);
+      } catch (error) {
+        console.error('Error fetching suggested users:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchSuggestedUsers();
-  }, [currentUserId]);
-
-  const fetchSuggestedUsers = async () => {
-    try {
-      // For now, just get all users except the current user
-      // In a real app, you'd have a more sophisticated recommendation algorithm
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .neq('id', currentUserId || '')
-        .limit(5);
-
-      if (error) throw error;
-      setUsers(data || []);
-    } catch (error) {
-      console.error('Error fetching suggested users:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [currentUserId, supabase]);
 
   if (loading) {
     return (

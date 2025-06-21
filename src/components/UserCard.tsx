@@ -1,5 +1,5 @@
 'use client';
-import { FC, useState, useEffect } from "react";
+import { FC, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
@@ -19,13 +19,7 @@ const UserCard: FC<UserCardProps> = ({ user, currentUserId }) => {
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
 
-  useEffect(() => {
-    if (currentUserId && currentUserId !== user.id) {
-      checkFollowing();
-    }
-  }, [currentUserId, user.id]);
-
-  const checkFollowing = async () => {
+  const checkFollowing = useCallback(async () => {
     if (!currentUserId) return;
     
     const { data } = await supabase
@@ -36,7 +30,13 @@ const UserCard: FC<UserCardProps> = ({ user, currentUserId }) => {
       .single();
 
     setIsFollowing(!!data);
-  };
+  }, [currentUserId, user.id, supabase]);
+
+  useEffect(() => {
+    if (currentUserId && currentUserId !== user.id) {
+      checkFollowing();
+    }
+  }, [currentUserId, user.id, checkFollowing]);
 
   const handleFollow = async () => {
     if (!currentUserId || loading) return;

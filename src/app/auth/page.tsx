@@ -44,8 +44,12 @@ export default function AuthPage() {
         if (error) throw error;
         router.push('/');
       }
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
     } finally {
       setLoading(false);
     }
