@@ -1,8 +1,8 @@
-import Image from 'next/image';
+import Image from "next/image";
 
 export function ProfileLink() {
   return (
-    <div className="flex items-center gap-3 p-3 rounded-full hover:bg-gray-100 cursor-pointer">
+    <div className="flex cursor-pointer items-center gap-3 rounded-full p-3 hover:bg-gray-100">
       <Image
         src="/profile-pic.png" // Placeholder image
         alt="Profile picture"
@@ -16,4 +16,4 @@ export function ProfileLink() {
       </div>
     </div>
   );
-} 
+}

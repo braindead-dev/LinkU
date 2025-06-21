@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { FC, useState, useEffect, useCallback } from "react";
 import PostComposer from "@/components/PostComposer";
 import PostCard from "@/components/PostCard";
@@ -6,9 +6,9 @@ import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
 
 const TABS = ["For you", "Following"] as const;
-type Tab = typeof TABS[number];
-type Profile = Database['public']['Tables']['profiles']['Row'];
-type Post = Database['public']['Tables']['posts']['Row'] & {
+type Tab = (typeof TABS)[number];
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+type Post = Database["public"]["Tables"]["posts"]["Row"] & {
   profiles: Profile;
 };
 
@@ -24,12 +24,12 @@ const TabNav: FC<{
   active: string;
   onChange: (t: Tab) => void;
 }> = ({ tabs, active, onChange }) => (
-  <nav className="flex border-b border-gray-200 dark:border-neutral-800 sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur z-10">
+  <nav className="sticky top-0 z-10 flex border-b border-gray-200 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-black/80">
     {tabs.map((tab) => (
       <button
         key={tab}
         onClick={() => onChange(tab)}
-        className={`flex-1 py-4 font-medium hover:bg-gray-50 dark:hover:bg-neutral-900 transition-colors ${
+        className={`flex-1 py-4 font-medium transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900 ${
           active === tab ? "border-b-2 border-blue-500" : "text-gray-500"
         }`}
       >
@@ -52,23 +52,25 @@ const TimelineTabs: FC<TimelineTabsProps> = ({ profile }) => {
     setLoading(true);
     try {
       let query = supabase
-        .from('posts')
-        .select(`
+        .from("posts")
+        .select(
+          `
           *,
           profiles (*)
-        `)
-        .order('created_at', { ascending: false });
+        `,
+        )
+        .order("created_at", { ascending: false });
 
-      if (active === 'Following' && profile) {
+      if (active === "Following" && profile) {
         // First get the list of users this person is following
         const { data: following } = await supabase
-          .from('following')
-          .select('following_id')
-          .eq('follower_id', profile.id);
+          .from("following")
+          .select("following_id")
+          .eq("follower_id", profile.id);
 
         if (following && following.length > 0) {
-          const followingIds = following.map(f => f.following_id);
-          query = query.in('user_id', followingIds);
+          const followingIds = following.map((f) => f.following_id);
+          query = query.in("user_id", followingIds);
         } else {
           // If not following anyone, show empty
           setPosts([]);
@@ -82,7 +84,7 @@ const TimelineTabs: FC<TimelineTabsProps> = ({ profile }) => {
       if (error) throw error;
       setPosts(data || []);
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      console.error("Error fetching posts:", error);
     } finally {
       setLoading(false);
     }
@@ -95,12 +97,13 @@ const TimelineTabs: FC<TimelineTabsProps> = ({ profile }) => {
   // Subscribe to new posts
   useEffect(() => {
     const channel = supabase
-      .channel('posts')
-      .on('postgres_changes', 
-        { event: 'INSERT', schema: 'public', table: 'posts' },
+      .channel("posts")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "posts" },
         () => {
           fetchPosts();
-        }
+        },
       )
       .subscribe();
 
@@ -113,23 +116,20 @@ const TimelineTabs: FC<TimelineTabsProps> = ({ profile }) => {
     <section>
       <TabNav tabs={TABS} active={active} onChange={setActive} />
       <PostComposer profile={profile} />
-      
+
       {loading ? (
         <div className="p-8 text-center text-gray-500">Loading posts...</div>
       ) : posts.length === 0 ? (
         <div className="p-8 text-center text-gray-500">
-          {active === 'Following' 
+          {active === "Following"
             ? "No posts from people you follow yet. Follow some users to see their posts here!"
-            : "No posts yet. Be the first to post something!"
-          }
+            : "No posts yet. Be the first to post something!"}
         </div>
       ) : (
-        posts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))
+        posts.map((post) => <PostCard key={post.id} post={post} />)
       )}
     </section>
   );
 };
 
-export default TimelineTabs; 
+export default TimelineTabs;

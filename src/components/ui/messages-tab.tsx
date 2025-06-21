@@ -1,12 +1,12 @@
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare } from "lucide-react";
 
 export function MessagesTab() {
   return (
-    <div className="fixed bottom-0 right-5 bg-white w-80 rounded-t-lg shadow-lg border">
-      <div className="flex justify-between items-center p-3 cursor-pointer">
+    <div className="fixed right-5 bottom-0 w-80 rounded-t-lg border bg-white shadow-lg">
+      <div className="flex cursor-pointer items-center justify-between p-3">
         <h2 className="font-bold">Messages</h2>
         <MessageSquare />
       </div>
     </div>
   );
-} 
+}
