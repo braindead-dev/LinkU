@@ -2,7 +2,7 @@ import { createClient } from '@/utils/supabase/server';
 import { notFound } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import PostCard from '@/components/PostCard';
-import UserCard from '@/components/UserCard';
+import FollowButton from '@/components/FollowButton';
 import {
   MapPinIcon,
   CalendarIcon,
@@ -69,7 +69,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               Edit profile
             </button>
           ) : (
-            <UserCard user={profile} currentUserId={user?.id} />
+            <FollowButton user={profile} currentUserId={user?.id} />
           )}
         </div>
 
