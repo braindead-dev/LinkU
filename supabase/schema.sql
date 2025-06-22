@@ -22,6 +22,7 @@ CREATE TABLE posts (
   content TEXT NOT NULL,
   image_url TEXT,
   parent_post_id UUID REFERENCES posts(id) ON DELETE CASCADE,
+  is_ai_generated BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
@@ -43,6 +44,7 @@ CREATE TABLE user_messages (
   recipient_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   content TEXT NOT NULL,
   read BOOLEAN DEFAULT FALSE,
+  is_ai_generated BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
 
