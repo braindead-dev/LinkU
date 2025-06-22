@@ -162,6 +162,15 @@ export default function CalibrationPage() {
           </button>
         </form>
       </div>
+
+      <div className="mt-4">
+        <button
+          onClick={() => router.push("/")}
+          className="rounded-full bg-blue-600 px-8 py-3 font-medium text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        >
+          Done
+        </button>
+      </div>
     </div>
   );
 }
