@@ -5,6 +5,7 @@ import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { House, MessageSquare } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,10 +38,17 @@ const Sidebar: FC<SidebarProps> = ({ profile }) => {
     <aside className="sticky top-0 hidden h-screen w-60 gap-2 border-r border-gray-200 p-4 md:flex md:flex-col dark:border-neutral-800">
       <LogoSection />
       <nav className="flex flex-col gap-4 text-lg font-medium">
-        <SidebarLink label="Home" href="/" />
-        <SidebarLink label="Messages" />
+        <SidebarLink
+          label="Home"
+          href="/"
+          icon={<House className="h-5 w-5" />}
+        />
+        <SidebarLink
+          label="Messages"
+          icon={<MessageSquare className="h-5 w-5" />}
+        />
       </nav>
-      <div className="mt-auto">
+      <div className="mt-auto -ml-4">
         <ProfileSection profile={profile} onSignOut={handleSignOut} />
       </div>
     </aside>
@@ -106,20 +114,28 @@ const ProfileSection: FC<{
 interface SidebarLinkProps {
   label: string;
   href?: string;
+  icon?: React.ReactNode;
 }
 
-const SidebarLink: FC<SidebarLinkProps> = ({ label, href }) => {
+const SidebarLink: FC<SidebarLinkProps> = ({ label, href, icon }) => {
+  const linkContent = (
+    <div className="flex items-center gap-3">
+      {icon}
+      {label}
+    </div>
+  );
+
   if (href) {
     return (
       <Link href={href} className="hover:underline">
-        {label}
+        {linkContent}
       </Link>
     );
   }
 
   return (
     <a href="#" className="hover:underline">
-      {label}
+      {linkContent}
     </a>
   );
 };
