@@ -11,6 +11,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const TABS = ["All", "Bot", "Inbox"] as const;
 type Tab = (typeof TABS)[number];
@@ -35,6 +36,9 @@ interface ActivityItem {
   post_content?: string;
   timestamp: string;
   read: boolean;
+  // Navigation data
+  post_id?: string;
+  parent_post_id?: string;
 }
 
 /**
@@ -117,6 +121,35 @@ const ActivityCard: FC<{ item: ActivityItem; activeTab: Tab }> = ({
   item,
   activeTab,
 }) => {
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    switch (item.type) {
+      case "like":
+        if (item.post_id) {
+          router.push(`/post/${item.post_id}`);
+        }
+        break;
+      case "follow":
+        if (item.user?.username) {
+          router.push(`/${item.user.username}`);
+        }
+        break;
+      case "message":
+        // Navigate to messages page - you might want to specify the conversation
+        router.push(`/messages`);
+        break;
+      case "reply":
+        if (item.parent_post_id) {
+          router.push(`/post/${item.parent_post_id}`);
+        }
+        break;
+      default:
+        // For bot activities, don't navigate
+        break;
+    }
+  };
+
   const renderUserActivity = (actionText: React.ReactNode) => (
     <div className="flex items-center gap-3">
       <Link href={`/${item.user?.username}`}>
@@ -188,14 +221,20 @@ const ActivityCard: FC<{ item: ActivityItem; activeTab: Tab }> = ({
   const isBotActivity =
     item.type === "bot_conversation" || item.type === "bot_summary";
   const shouldHighlight = activeTab === "All" && isBotActivity;
+  const isClickable = ["like", "follow", "message", "reply"].includes(
+    item.type,
+  );
 
   return (
     <div
-      className={`border-b border-gray-100 p-4 transition-colors ${!shouldHighlight && "hover:bg-gray-50"} dark:border-neutral-800 dark:hover:bg-neutral-900 ${
+      className={`border-b border-gray-100 p-4 transition-colors ${
+        !shouldHighlight && "hover:bg-gray-50"
+      } dark:border-neutral-800 dark:hover:bg-neutral-900 ${
         shouldHighlight
           ? "bg-blue-50 hover:bg-sky-50 dark:bg-blue-950/20 dark:hover:bg-blue-950/30"
           : ""
-      }`}
+      } ${isClickable ? "cursor-pointer" : ""}`}
+      onClick={isClickable ? handleCardClick : undefined}
     >
       {getContent()}
     </div>
@@ -247,6 +286,7 @@ const ActivityTabs: FC<ActivityTabsProps> = () => {
           id,
           created_at,
           user_id,
+          post_id,
           profiles!inner(
             id,
             username,
@@ -277,6 +317,7 @@ const ActivityTabs: FC<ActivityTabsProps> = () => {
           post_content: likeData.posts.content,
           timestamp: likeData.created_at,
           read: false,
+          post_id: likeData.post_id,
         };
       });
     } catch (error) {
@@ -445,6 +486,7 @@ const ActivityTabs: FC<ActivityTabsProps> = () => {
           post_content: replyData.parent_post?.content,
           timestamp: replyData.created_at,
           read: false,
+          parent_post_id: replyData.parent_post_id,
         };
       });
     } catch (error) {
