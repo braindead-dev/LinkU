@@ -17,6 +17,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import AIAnalysisModal from "./AIAnalysisModal";
 
 type ProfilePageProps = {
   params: Promise<{
@@ -50,6 +51,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
     undefined,
   );
   const [username, setUsername] = useState<string>("");
+  const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
 
   const supabase = createClient();
 
@@ -95,6 +97,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
         .select(
           `
           *,
+          core_memories,
           following:following!follower_id(count),
           followers:following!following_id(count)
         `,
@@ -263,7 +266,10 @@ export default function ProfilePage({ params }: ProfilePageProps) {
             {profile.full_name || profile.username}
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="translate-y-0.5 rounded-lg border-1 border-neutral-200 bg-neutral-100 p-1 hover:cursor-pointer dark:border-neutral-700 dark:bg-neutral-800">
+                <div
+                  onClick={() => setIsAnalysisOpen(true)}
+                  className="translate-y-0.5 rounded-lg border-1 border-neutral-200 bg-neutral-100 p-1 hover:cursor-pointer dark:border-neutral-700 dark:bg-neutral-800"
+                >
                   <BrainCircuit className="h-5 w-5 text-neutral-600" />
                 </div>
               </TooltipTrigger>
@@ -407,6 +413,12 @@ export default function ProfilePage({ params }: ProfilePageProps) {
             ))
           ))}
       </div>
+
+      <AIAnalysisModal
+        isOpen={isAnalysisOpen}
+        onOpenChange={setIsAnalysisOpen}
+        profile={profile}
+      />
     </div>
   );
 }
