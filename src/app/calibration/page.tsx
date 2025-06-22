@@ -13,8 +13,7 @@ export default function CalibrationPage() {
   >([
     {
       from: "bot",
-      text:
-        "Welcome to Linku! Before you get started, let's calibrate your agent. Tell me a bit about your interests or what you want your agent to focus on.",
+      text: "Welcome to Linku! Before you get started, let's calibrate your agent. Tell me a bit about your interests or what you want your agent to focus on.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -98,15 +97,15 @@ export default function CalibrationPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-black">
-      <div className="mb-8">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 dark:bg-black">
+      <div className="mb-4">
         <Image
           src="/logo.png"
           alt="Linku Logo"
@@ -116,13 +115,13 @@ export default function CalibrationPage() {
         />
       </div>
 
-      <div className="w-full max-w-lg rounded-xl bg-white p-8 shadow-lg dark:bg-neutral-900 flex flex-col gap-4">
-        <h2 className="text-center text-2xl font-bold mb-2">
+      <div className="flex w-full max-w-lg flex-col gap-4 rounded-xl bg-white p-8 shadow-lg dark:bg-neutral-900">
+        <h2 className="mb-2 text-center text-2xl font-bold">
           Hey! Who are you?
         </h2>
 
         <div
-          className="flex flex-col gap-2 mb-4 max-h-96 min-h-[10rem] overflow-y-auto transition-all"
+          className="mb-4 flex max-h-96 min-h-[10rem] flex-col gap-2 overflow-y-auto transition-all"
           style={{ height: "28rem" }}
         >
           {messages.map((msg, idx) => (
@@ -130,11 +129,11 @@ export default function CalibrationPage() {
               key={idx}
               className={`rounded-lg px-4 py-2 text-sm ${
                 msg.from === "bot"
-                  ? "bg-blue-50 text-blue-900 self-start dark:bg-blue-900/20 dark:text-blue-200"
-                  : "bg-gray-100 text-gray-900 self-end dark:bg-neutral-800 dark:text-gray-100"
+                  ? "self-start bg-blue-50 text-blue-900 dark:bg-blue-900/20 dark:text-blue-200"
+                  : "self-end bg-gray-100 text-gray-900 dark:bg-neutral-800 dark:text-gray-100"
               }`}
             >
-              <span className="font-semibold mr-2">
+              <span className="mr-2 font-semibold">
                 {msg.from === "bot" ? "Linku Bot:" : "You:"}
               </span>
               {msg.text}
@@ -156,7 +155,7 @@ export default function CalibrationPage() {
           <button
             type="submit"
             disabled={sending || !input.trim()}
-            className="rounded-full bg-blue-600 px-4 py-2 text-white font-medium shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-50"
+            className="rounded-full bg-blue-600 px-4 py-2 font-medium text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:opacity-50"
           >
             Send
           </button>

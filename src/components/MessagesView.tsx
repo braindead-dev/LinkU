@@ -361,16 +361,17 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
                     } transition-all`}
                   >
                     <div className="group flex items-center gap-3">
-                      {message.is_ai_generated && message.sender_id === currentUser.id && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Bot className="h-5 w-5 flex-shrink-0 translate-y-1.5 text-gray-500" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>AI generated content</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
+                      {message.is_ai_generated &&
+                        message.sender_id === currentUser.id && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Bot className="h-5 w-5 flex-shrink-0 translate-y-1.5 text-gray-500" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>AI generated content</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
                       <div className="flex flex-col">
                         <div
                           className={`max-w-xs cursor-default px-4 py-1.5 ${
@@ -400,16 +401,17 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
                           {formatTime(message.created_at)}
                         </p>
                       </div>
-                      {message.is_ai_generated && message.sender_id !== currentUser.id && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Bot className="h-5 w-5 flex-shrink-0 text-gray-500" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>AI generated content</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
+                      {message.is_ai_generated &&
+                        message.sender_id !== currentUser.id && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Bot className="h-5 w-5 flex-shrink-0 text-gray-500" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>AI generated content</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
                     </div>
                   </div>
                 );
