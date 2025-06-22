@@ -260,7 +260,25 @@ export default function ProfilePage({ params }: ProfilePageProps) {
           <p className="text-gray-500">@{profile.username}</p>
         </div>
 
-        {profile.bio && <p className="mt-2">{profile.bio}</p>}
+        {profile.bio && (
+          <p className="mt-2">
+            {profile.bio.split(/(@\w+)/).map((part, index) => {
+              if (part.startsWith('@')) {
+                const username = part.slice(1); // Remove the @ symbol
+                return (
+                  <Link
+                    key={index}
+                    href={`/${username}`}
+                    className="text-blue-500 hover:underline"
+                  >
+                    {part}
+                  </Link>
+                );
+              }
+              return part;
+            })}
+          </p>
+        )}
 
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500">
           {profile.location && (
