@@ -45,7 +45,7 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
       </Link>
 
       <div className="min-w-0 flex-1">
-        <header className="flex items-baseline gap-2">
+        <header className="-mt-1 flex items-baseline gap-2">
           <Link
             href={`/${post.profiles.username}`}
             className="truncate font-semibold hover:underline"
@@ -63,7 +63,7 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
             {formatDate(post.created_at)}
           </time>
         </header>
-        <p className="mt-1 break-words whitespace-pre-wrap">{post.content}</p>
+        <p className="break-words whitespace-pre-wrap">{post.content}</p>
         {post.image_url && (
           <div className="mt-3 overflow-hidden rounded-2xl border border-gray-200 dark:border-neutral-800">
             <Image
