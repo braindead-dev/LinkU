@@ -74,7 +74,7 @@ const PostComposer: FC<PostComposerProps> = ({ profile }) => {
           <button
             onClick={handlePost}
             disabled={!content.trim() || content.length > 280 || isPosting}
-            className="rounded-full bg-blue-500 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-400"
+            className="rounded-full bg-blue-500 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-600 disabled:bg-gray-400"
           >
             {isPosting ? "Posting..." : "Post"}
           </button>
