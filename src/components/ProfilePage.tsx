@@ -8,7 +8,7 @@ import PostCard from "@/components/PostCard";
 import FollowButton from "@/components/FollowButton";
 import MessageButton from "@/components/MessageButton";
 import { MapPinIcon, CalendarIcon } from "@heroicons/react/24/outline";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BrainCircuit } from "lucide-react";
 import Link from "next/link";
 import { Database } from "@/types/database.types";
 import Image from "next/image";
@@ -254,8 +254,11 @@ export default function ProfilePage({ params }: ProfilePageProps) {
         </div>
 
         <div className="mt-4">
-          <h1 className="text-2xl font-bold">
+          <h1 className="flex items-center gap-2 text-2xl font-bold">
             {profile.full_name || profile.username}
+            <div className="translate-y-0.5 rounded-lg border-1 border-neutral-200 bg-neutral-100 p-1 hover:cursor-pointer dark:border-neutral-700 dark:bg-neutral-800">
+              <BrainCircuit className="h-5 w-5 text-neutral-600" />
+            </div>
           </h1>
           <p className="text-gray-500">@{profile.username}</p>
         </div>
