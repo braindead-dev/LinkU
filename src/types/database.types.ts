@@ -15,6 +15,7 @@ export interface Database {
           username: string;
           full_name: string | null;
           avatar_url: string | null;
+          background_url: string | null;
           bio: string | null;
           location: string | null;
           core_memories: string | null;
@@ -26,6 +27,7 @@ export interface Database {
           username: string;
           full_name?: string | null;
           avatar_url?: string | null;
+          background_url?: string | null;
           bio?: string | null;
           location?: string | null;
           core_memories?: string | null;
@@ -37,6 +39,7 @@ export interface Database {
           username?: string;
           full_name?: string | null;
           avatar_url?: string | null;
+          background_url?: string | null;
           bio?: string | null;
           location?: string | null;
           core_memories?: string | null;
@@ -50,6 +53,8 @@ export interface Database {
           user_id: string;
           content: string;
           image_url: string | null;
+          parent_post_id: string | null;
+          is_ai_generated: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -58,6 +63,8 @@ export interface Database {
           user_id: string;
           content: string;
           image_url?: string | null;
+          parent_post_id?: string | null;
+          is_ai_generated?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -66,6 +73,8 @@ export interface Database {
           user_id?: string;
           content?: string;
           image_url?: string | null;
+          parent_post_id?: string | null;
+          is_ai_generated?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -90,13 +99,14 @@ export interface Database {
           created_at?: string;
         };
       };
-      messages: {
+      user_messages: {
         Row: {
           id: string;
           sender_id: string;
           recipient_id: string;
           content: string;
           read: boolean;
+          is_ai_generated: boolean;
           created_at: string;
         };
         Insert: {
@@ -105,6 +115,7 @@ export interface Database {
           recipient_id: string;
           content: string;
           read?: boolean;
+          is_ai_generated?: boolean;
           created_at?: string;
         };
         Update: {
@@ -113,6 +124,27 @@ export interface Database {
           recipient_id?: string;
           content?: string;
           read?: boolean;
+          is_ai_generated?: boolean;
+          created_at?: string;
+        };
+      };
+      likes: {
+        Row: {
+          id: string;
+          user_id: string;
+          post_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          post_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          post_id?: string;
           created_at?: string;
         };
       };

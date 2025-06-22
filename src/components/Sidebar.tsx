@@ -5,7 +5,14 @@ import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { House, MessageSquare } from "lucide-react";
+import {
+  House,
+  MessageSquare,
+  User,
+  LogOut,
+  Bell,
+  Settings,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,33 +26,58 @@ type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 interface SidebarProps {
   profile: Profile | null;
+  unreadCount?: number;
 }
 
 /**
  * Sidebar – renders the left column with profile information.
  * Only visible on medium screens and up.
  */
-const Sidebar: FC<SidebarProps> = ({ profile }) => {
+const Sidebar: FC<SidebarProps> = ({ profile, unreadCount = 0 }) => {
   const router = useRouter();
   const supabase = createClient();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push("/auth");
+    router.push("/login");
   };
 
   return (
     <aside className="sticky top-0 hidden h-screen w-60 gap-2 border-r border-gray-200 p-4 md:flex md:flex-col dark:border-neutral-800">
       <LogoSection />
-      <nav className="flex flex-col gap-4 text-lg font-medium">
+      <nav className="flex flex-col gap-4 text-xl font-medium">
         <SidebarLink
           label="Home"
           href="/"
-          icon={<House className="h-5 w-5" />}
+          icon={<House className="h-6 w-6" />}
         />
         <SidebarLink
           label="Messages"
-          icon={<MessageSquare className="h-5 w-5" />}
+          href="/messages"
+          icon={
+            <div className="relative">
+              <MessageSquare className="h-6 w-6" />
+              {unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-1 border-white bg-red-500 text-[10px] font-medium text-white">
+                  <span
+                    className={unreadCount > 9 ? "text-[8px]" : "text-[10px]"}
+                  >
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                </div>
+              )}
+            </div>
+          }
+        />
+        <SidebarLink
+          label="Notifications"
+          href="/notifications"
+          icon={<Bell className="h-6 w-6" />}
+        />
+        <SidebarLink
+          label="Profile"
+          href={`/${profile?.username}`}
+          icon={<User className="h-6 w-6" />}
         />
       </nav>
       <div className="mt-auto -ml-4">
@@ -65,7 +97,7 @@ const LogoSection: FC = () => {
         <Image
           src="/logo.png"
           alt="Logo"
-          width={75}
+          width={85}
           height={50}
           className="h-auto"
         />
@@ -92,7 +124,7 @@ const ProfileSection: FC<{
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <span className="block truncate leading-none font-semibold">
+            <span className="mb-1 block truncate leading-none font-semibold">
               {profile.full_name || profile.username}
             </span>
             <span className="block truncate text-sm leading-none text-gray-500">
@@ -103,9 +135,21 @@ const ProfileSection: FC<{
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" side="bottom" align="start">
         <DropdownMenuItem asChild>
-          <Link href={`/${profile.username}`}>Profile</Link>
+          <Link href={`/${profile.username}`}>
+            <User className="h-4 w-4 text-black" />
+            Profile
+          </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={onSignOut}>Sign out</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/settings">
+            <Settings className="h-4 w-4 text-black" />
+            Settings
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={onSignOut}>
+          <LogOut className="h-4 w-4 text-red-500" />
+          Sign out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -1,12 +1,12 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
-import TimelineTabs from "@/components/TimelineTabs";
 import SearchBar from "@/components/SearchBar";
 import SuggestedUsers from "@/components/SuggestedUsers";
 import { getUnreadConversationsCount } from "@/utils/unreadCount";
+import Image from "next/image";
 
-export default async function Home() {
+export default async function NotFound() {
   const supabase = await createClient();
 
   const {
@@ -71,11 +71,6 @@ export default async function Home() {
     }
   }
 
-
-  if (profile && !profile.agent_id) {
-    redirect(`/calibration?userId=${profile.id}`);
-  }
-  
   // Get unread conversations count
   const unreadCount = await getUnreadConversationsCount(user.id);
 
@@ -85,7 +80,19 @@ export default async function Home() {
 
       {/* Feed */}
       <main className="min-h-screen flex-1 border-x border-gray-100 pb-24 dark:border-neutral-800">
-        <TimelineTabs profile={profile} />
+        <div className="flex h-full flex-col items-center justify-center">
+          <Image
+            src="/square_logo.png"
+            alt="Logo"
+            width={100}
+            height={100}
+            className="mb-8 h-auto"
+          />
+          <h1 className="mb-2 text-2xl font-bold">404 - Page Not Found</h1>
+          <p className="text-neutral-500">
+            The page you are looking for does not exist.
+          </p>
+        </div>
       </main>
 
       {/* Right column */}
