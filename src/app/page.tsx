@@ -15,7 +15,7 @@ export default async function Home() {
   } = await supabase.auth.getUser();
 
   if (!user || userError) {
-    redirect("/auth");
+    redirect("/login");
   }
 
   // Fetch user profile
@@ -71,6 +71,11 @@ export default async function Home() {
     }
   }
 
+
+  if (profile && !profile.agent_id) {
+    redirect(`/calibration?userId=${profile.id}`);
+  }
+  
   return (
     <div className="mx-auto flex max-w-7xl">
       <Sidebar profile={profile} />
