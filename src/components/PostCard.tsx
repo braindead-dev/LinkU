@@ -30,7 +30,7 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
   };
 
   return (
-    <article className="flex gap-4 border-b border-gray-200 p-4 transition-colors hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-900/50">
+    <article className="flex gap-4 border-b border-gray-100 p-4 transition-colors hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-900/50">
       <Link href={`/${post.profiles.username}`}>
         <Avatar className="h-10 w-10 shrink-0">
           <AvatarImage
@@ -65,7 +65,7 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
         </header>
         <p className="break-words whitespace-pre-wrap">{post.content}</p>
         {post.image_url && (
-          <div className="mt-3 overflow-hidden rounded-2xl border border-gray-200 dark:border-neutral-800">
+          <div className="mt-3 overflow-hidden rounded-2xl border border-gray-100 dark:border-neutral-800">
             <Image
               src={post.image_url}
               alt="Post image"

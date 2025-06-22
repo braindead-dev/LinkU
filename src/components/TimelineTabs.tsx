@@ -24,7 +24,7 @@ const TabNav: FC<{
   active: string;
   onChange: (t: Tab) => void;
 }> = ({ tabs, active, onChange }) => (
-  <nav className="sticky top-0 z-10 flex border-b border-gray-200 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-black/80">
+  <nav className="sticky top-0 z-10 flex border-b border-gray-100 bg-white/80 backdrop-blur dark:border-neutral-800 dark:bg-black/80">
     {tabs.map((tab) => (
       <button
         key={tab}
