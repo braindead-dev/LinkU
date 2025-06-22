@@ -357,10 +357,15 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
                   >
                     <div className="group flex flex-col">
                       <div
-                        className={`max-w-xs cursor-default rounded-full px-4 py-1.5 ${
+                        className={`max-w-xs cursor-default px-4 py-1.5 ${
                           message.sender_id === currentUser.id
                             ? "bg-blue-500 text-white"
                             : "bg-gray-100 dark:bg-neutral-800"
+                        } ${
+                          message.content.includes(" ") ||
+                          message.content.length > 40
+                            ? "rounded-xl"
+                            : "rounded-full"
                         }`}
                       >
                         <p className="break-words">{message.content}</p>
