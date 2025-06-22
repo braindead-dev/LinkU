@@ -38,22 +38,22 @@ const Sidebar: FC<SidebarProps> = ({ profile, unreadCount = 0 }) => {
   return (
     <aside className="sticky top-0 hidden h-screen w-60 gap-2 border-r border-gray-200 p-4 md:flex md:flex-col dark:border-neutral-800">
       <LogoSection />
-      <nav className="flex flex-col gap-4 text-lg font-medium">
+      <nav className="flex flex-col gap-4 text-xl font-medium">
         <SidebarLink
           label="Home"
           href="/"
-          icon={<House className="h-5 w-5" />}
+          icon={<House className="h-6 w-6" />}
         />
         <SidebarLink
           label="Messages"
           href="/messages"
           icon={
             <div className="relative">
-              <MessageSquare className="h-5 w-5" />
+              <MessageSquare className="h-6 w-6" />
               {unreadCount > 0 && (
-                <div className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full border-1 border-white bg-red-500 text-[10px] font-medium text-white">
+                <div className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-1 border-white bg-red-500 text-[10px] font-medium text-white">
                   <span
-                    className={unreadCount > 9 ? "text-[7px]" : "text-[10px]"}
+                    className={unreadCount > 9 ? "text-[8px]" : "text-[10px]"}
                   >
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
@@ -80,7 +80,7 @@ const LogoSection: FC = () => {
         <Image
           src="/logo.png"
           alt="Logo"
-          width={75}
+          width={85}
           height={50}
           className="h-auto"
         />

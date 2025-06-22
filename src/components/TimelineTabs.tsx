@@ -126,7 +126,9 @@ const TimelineTabs: FC<TimelineTabsProps> = ({ profile }) => {
             : "No posts yet. Be the first to post something!"}
         </div>
       ) : (
-        posts.map((post) => <PostCard key={post.id} post={post} />)
+        posts.map((post) => (
+          <PostCard key={post.id} post={post} currentUserId={profile?.id} />
+        ))
       )}
     </section>
   );

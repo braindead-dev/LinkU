@@ -154,7 +154,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               new Date(a.created_at).getTime(),
           )
           .map((post: Post) => (
-            <PostCard key={post.id} post={{ ...post, profiles: profile }} />
+            <PostCard
+              key={post.id}
+              post={{ ...post, profiles: profile }}
+              currentUserId={user?.id}
+            />
           ))}
       </div>
     </div>

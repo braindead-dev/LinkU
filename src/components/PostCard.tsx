@@ -1,22 +1,135 @@
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import Link from "next/link";
-import { FC } from "react";
+import { FC, useState, useEffect } from "react";
 import { Database } from "@/types/database.types";
+import { createClient } from "@/utils/supabase/client";
+import { Heart, MessageCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Post = Database["public"]["Tables"]["posts"]["Row"];
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+type Like = Database["public"]["Tables"]["likes"]["Row"];
 
 interface PostCardProps {
   post: Post & {
     profiles: Profile;
+    likes?: Like[];
+    replies?: Post[];
+    _count?: {
+      likes: number;
+      replies: number;
+    };
   };
+  currentUserId?: string;
 }
 
 /**
- * PostCard – displays a single post.
+ * PostCard – displays a single post with like and reply functionality.
  */
-const PostCard: FC<PostCardProps> = ({ post }) => {
+const PostCard: FC<PostCardProps> = ({ post, currentUserId }) => {
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [replyCount, setReplyCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  const supabase = createClient();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Load initial like state and counts
+    loadPostStats();
+  }, [post.id]);
+
+  const loadPostStats = async () => {
+    try {
+      // Check if current user has liked this post
+      if (currentUserId) {
+        const { data: userLike } = await supabase
+          .from("likes")
+          .select("*")
+          .eq("post_id", post.id)
+          .eq("user_id", currentUserId)
+          .single();
+
+        setLiked(!!userLike);
+      }
+
+      // Get like count
+      const { count: likeCount } = await supabase
+        .from("likes")
+        .select("*", { count: "exact", head: true })
+        .eq("post_id", post.id);
+
+      setLikeCount(likeCount || 0);
+
+      // Get reply count
+      const { count: replyCount } = await supabase
+        .from("posts")
+        .select("*", { count: "exact", head: true })
+        .eq("parent_post_id", post.id);
+
+      setReplyCount(replyCount || 0);
+    } catch (error) {
+      console.error("Error loading post stats:", error);
+    }
+  };
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!currentUserId) {
+      router.push("/login");
+      return;
+    }
+
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      if (liked) {
+        // Unlike
+        const { error } = await supabase
+          .from("likes")
+          .delete()
+          .eq("post_id", post.id)
+          .eq("user_id", currentUserId);
+
+        if (!error) {
+          setLiked(false);
+          setLikeCount((prev) => Math.max(0, prev - 1));
+        }
+      } else {
+        // Like
+        const { error } = await supabase.from("likes").insert({
+          post_id: post.id,
+          user_id: currentUserId,
+        });
+
+        if (!error) {
+          setLiked(true);
+          setLikeCount((prev) => prev + 1);
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReply = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Navigate to post detail page where user can reply
+    router.push(`/post/${post.id}`);
+  };
+
+  const handlePostClick = () => {
+    router.push(`/post/${post.id}`);
+  };
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -30,8 +143,14 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
   };
 
   return (
-    <article className="flex gap-4 border-b border-gray-100 p-4 transition-colors hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-900/50">
-      <Link href={`/${post.profiles.username}`}>
+    <article
+      onClick={handlePostClick}
+      className="flex cursor-pointer gap-4 border-b border-gray-100 p-4 transition-colors hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-900/50"
+    >
+      <Link
+        href={`/${post.profiles.username}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <Avatar className="h-10 w-10 shrink-0">
           <AvatarImage
             src={post.profiles.avatar_url ?? undefined}
@@ -48,12 +167,14 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
         <header className="-mt-1 flex items-baseline gap-2">
           <Link
             href={`/${post.profiles.username}`}
+            onClick={(e) => e.stopPropagation()}
             className="truncate font-semibold hover:underline"
           >
             {post.profiles.full_name || post.profiles.username}
           </Link>
           <Link
             href={`/${post.profiles.username}`}
+            onClick={(e) => e.stopPropagation()}
             className="truncate text-sm text-gray-500"
           >
             @{post.profiles.username}
@@ -63,7 +184,13 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
             {formatDate(post.created_at)}
           </time>
         </header>
+
+        {post.parent_post_id && (
+          <p className="mb-1 text-sm text-gray-500">Replying to a post</p>
+        )}
+
         <p className="break-words whitespace-pre-wrap">{post.content}</p>
+
         {post.image_url && (
           <div className="mt-3 overflow-hidden rounded-2xl border border-gray-100 dark:border-neutral-800">
             <Image
@@ -75,6 +202,37 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
             />
           </div>
         )}
+
+        {/* Action buttons */}
+        <div className="mt-1 flex items-center">
+          <div className="flex w-12 items-center">
+            <button
+              onClick={handleLike}
+              className={`group -ml-1 flex items-center gap-0.5 transition-colors ${
+                liked ? "text-red-500" : "text-gray-500 hover:text-red-500"
+              }`}
+            >
+              <div className="rounded-full p-1 transition-colors group-hover:bg-red-50 dark:group-hover:bg-red-950/20">
+                <Heart
+                  className={`h-4.5 w-4.5 ${liked ? "fill-current" : ""}`}
+                />
+              </div>
+              {likeCount > 0 && <span className="text-sm">{likeCount}</span>}
+            </button>
+          </div>
+
+          <div className="flex items-center">
+            <button
+              onClick={handleReply}
+              className="group flex items-center gap-0.5 text-gray-500 transition-colors hover:text-blue-500"
+            >
+              <div className="rounded-full p-1 transition-colors group-hover:bg-blue-50 dark:group-hover:bg-blue-950/20">
+                <MessageCircle className="h-4.5 w-4.5" />
+              </div>
+              {replyCount > 0 && <span className="text-sm">{replyCount}</span>}
+            </button>
+          </div>
+        </div>
       </div>
     </article>
   );

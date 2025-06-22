@@ -50,6 +50,7 @@ export interface Database {
           user_id: string;
           content: string;
           image_url: string | null;
+          parent_post_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -58,6 +59,7 @@ export interface Database {
           user_id: string;
           content: string;
           image_url?: string | null;
+          parent_post_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -66,6 +68,7 @@ export interface Database {
           user_id?: string;
           content?: string;
           image_url?: string | null;
+          parent_post_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -113,6 +116,26 @@ export interface Database {
           recipient_id?: string;
           content?: string;
           read?: boolean;
+          created_at?: string;
+        };
+      };
+      likes: {
+        Row: {
+          id: string;
+          user_id: string;
+          post_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          post_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          post_id?: string;
           created_at?: string;
         };
       };
