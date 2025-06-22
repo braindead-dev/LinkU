@@ -54,6 +54,7 @@ export interface Database {
           content: string;
           image_url: string | null;
           parent_post_id: string | null;
+          is_ai_generated: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -63,6 +64,7 @@ export interface Database {
           content: string;
           image_url?: string | null;
           parent_post_id?: string | null;
+          is_ai_generated?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -72,6 +74,7 @@ export interface Database {
           content?: string;
           image_url?: string | null;
           parent_post_id?: string | null;
+          is_ai_generated?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -103,6 +106,7 @@ export interface Database {
           recipient_id: string;
           content: string;
           read: boolean;
+          is_ai_generated: boolean;
           created_at: string;
         };
         Insert: {
@@ -111,6 +115,7 @@ export interface Database {
           recipient_id: string;
           content: string;
           read?: boolean;
+          is_ai_generated?: boolean;
           created_at?: string;
         };
         Update: {
@@ -119,6 +124,7 @@ export interface Database {
           recipient_id?: string;
           content?: string;
           read?: boolean;
+          is_ai_generated?: boolean;
           created_at?: string;
         };
       };
