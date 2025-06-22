@@ -24,12 +24,17 @@ interface PostCardProps {
     };
   };
   currentUserId?: string;
+  hideReplyIndicator?: boolean;
 }
 
 /**
  * PostCard – displays a single post with like and reply functionality.
  */
-const PostCard: FC<PostCardProps> = ({ post, currentUserId }) => {
+const PostCard: FC<PostCardProps> = ({
+  post,
+  currentUserId,
+  hideReplyIndicator = false,
+}) => {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [replyCount, setReplyCount] = useState(0);
@@ -185,7 +190,7 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId }) => {
           </time>
         </header>
 
-        {post.parent_post_id && (
+        {post.parent_post_id && !hideReplyIndicator && (
           <p className="mb-1 text-sm text-gray-500">Replying to a post</p>
         )}
 

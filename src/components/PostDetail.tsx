@@ -127,13 +127,16 @@ const PostDetail: FC<PostDetailProps> = ({
                 className="ml-2 max-h-[200px] min-h-[40px] flex-1 resize-none border-none bg-transparent py-2 text-lg outline-none placeholder:text-gray-500"
                 rows={1}
               />
-              <button
-                type="submit"
-                disabled={!replyContent.trim() || posting}
-                className="rounded-full bg-blue-600 px-4 py-1.5 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {posting ? "Replying..." : "Reply"}
-              </button>
+
+              <div className="mt-2 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={!replyContent.trim() || posting}
+                  className="rounded-full bg-blue-600 px-4 py-1.5 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {posting ? "Replying..." : "Reply"}
+                </button>
+              </div>
             </div>
           </div>
         </form>
@@ -155,6 +158,7 @@ const PostDetail: FC<PostDetailProps> = ({
               key={reply.id}
               post={reply}
               currentUserId={currentUserId}
+              hideReplyIndicator={true}
             />
           ))
         )}
