@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { TextEffect } from "@/components/ui/text-effect";
 import { Database } from "@/types/database.types";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
@@ -168,9 +169,14 @@ export default function AIAnalysisModal({
 
             <div>
               <h3 className="mb-3 text-lg font-semibold">Biography</h3>
-              <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+              <TextEffect
+                per="char"
+                preset="fade"
+                speedReveal={3}
+                className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400"
+              >
                 {analysis.bio}
-              </p>
+              </TextEffect>
             </div>
 
             <Button
