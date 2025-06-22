@@ -148,7 +148,7 @@ const PostDetail: FC<PostDetailProps> = ({
                   hideBorder={true}
                 />
                 {/* Thread line - extends to next post or main post */}
-                <div className="absolute left-9 top-[60px] bottom-0 w-0.5 bg-gray-300 dark:bg-neutral-700" />
+                <div className="absolute top-[60px] bottom-0 left-9 w-0.5 bg-gray-300 dark:bg-neutral-700" />
               </div>
             ))}
           </div>
@@ -159,7 +159,7 @@ const PostDetail: FC<PostDetailProps> = ({
       <div className="relative">
         {/* Thread line from parent if exists - with padding */}
         {parentPosts.length > 0 && (
-          <div className="absolute left-9 -top-4 h-8 w-0.5 bg-gray-300 dark:bg-neutral-700" />
+          <div className="absolute -top-4 left-9 h-8 w-0.5 bg-gray-300 dark:bg-neutral-700" />
         )}
         <PostCard
           post={post}

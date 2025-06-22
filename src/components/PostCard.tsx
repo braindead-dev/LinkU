@@ -217,7 +217,7 @@ const PostCard: FC<PostCardProps> = ({
         )}
 
         {/* Action buttons */}
-        <div className="mt-1 flex items-center gap-4 -ml-1">
+        <div className="mt-1 -ml-1 flex items-center gap-4">
           <button
             onClick={handleLike}
             className={`group flex items-center transition-colors ${
