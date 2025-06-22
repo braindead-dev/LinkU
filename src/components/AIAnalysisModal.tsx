@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { TextEffect } from "@/components/ui/text-effect";
 import { TextShimmer } from "@/components/ui/text-shimmer";
+import { motion } from "motion/react";
 import { Database } from "@/types/database.types";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
@@ -147,16 +148,24 @@ export default function AIAnalysisModal({
 
         {!loading && !error && analysis && (
           <div className="space-y-6">
-            <div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0 }}
+            >
               <h3 className="mb-4 text-lg font-semibold">Personality</h3>
               <div className="space-y-2">
                 {personalityTraits.map((trait) => (
                   <PersonalityTrait key={trait.leftLabel} {...trait} />
                 ))}
               </div>
-            </div>
+            </motion.div>
 
-            <div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
+            >
               <h3 className="mb-3 text-lg font-semibold">Interests</h3>
               <div className="flex flex-wrap gap-2">
                 {analysis.tags.map((tag) => (
@@ -168,29 +177,40 @@ export default function AIAnalysisModal({
                   </span>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
-            <div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.2 }}
+            >
               <h3 className="mb-3 text-lg font-semibold">Biography</h3>
-              <TextEffect
-                per="char"
-                preset="fade"
+              <TextEffect 
+                per="char" 
+                preset="fade" 
                 speedReveal={3}
                 className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400"
+                delay={0.2}
               >
                 {analysis.bio}
               </TextEffect>
-            </div>
+            </motion.div>
 
-            <Button
-              onClick={() => {
-                onOpenChange(false);
-              }}
-              className="w-full border-2 border-neutral-600 bg-neutral-900 text-white hover:cursor-pointer hover:bg-neutral-800"
-              size="lg"
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: 0.3}}
             >
-              Reach Out
-            </Button>
+              <Button
+                onClick={() => {
+                  onOpenChange(false);
+                }}
+                className="w-full border-2 border-neutral-600 bg-neutral-900 text-white hover:cursor-pointer hover:bg-neutral-800"
+                size="lg"
+              >
+                Reach Out
+              </Button>
+            </motion.div>
           </div>
         )}
       </DialogContent>
