@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { config } from "@/lib/config";
 
 export default function CalibrationPage() {
   const [profile, setProfile] = useState<{ id: string } | null>(null);
@@ -57,7 +58,7 @@ export default function CalibrationPage() {
     setMessages((prev) => [...prev, { from: "user", text }]);
 
     try {
-      const res = await fetch(`http://localhost:3001/api/chat`, {
+      const res = await fetch(`${config.matchApiEndpoint}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, message: text }),

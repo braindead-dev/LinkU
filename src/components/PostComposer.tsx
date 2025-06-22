@@ -12,6 +12,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { config } from "@/lib/config";
+import Toast from "@/components/ui/toast";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -25,6 +26,7 @@ interface PostComposerProps {
 const PostComposer: FC<PostComposerProps> = ({ profile }) => {
   const [content, setContent] = useState("");
   const [isPosting, setIsPosting] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -56,6 +58,8 @@ const PostComposer: FC<PostComposerProps> = ({ profile }) => {
     }
 
     try {
+      setShowToast(true);
+
       const response = await fetch(`${config.matchApiEndpoint}/api/match`, {
         method: "POST",
         headers: {
@@ -83,65 +87,73 @@ const PostComposer: FC<PostComposerProps> = ({ profile }) => {
   };
 
   return (
-    <div className="flex gap-4 border-b border-gray-200 p-4 dark:border-neutral-800">
-      <Link href={`/${profile?.username}`}>
-        <Avatar className="h-10 w-10 shrink-0">
-          <AvatarImage src={profile?.avatar_url ?? undefined} alt="Profile" />
-          <AvatarFallback>
-            {profile?.full_name?.charAt(0).toUpperCase() ||
-              profile?.username?.charAt(0).toUpperCase() ||
-              "U"}
-          </AvatarFallback>
-        </Avatar>
-      </Link>
+    <>
+      <Toast
+        message="Post has been queued!"
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+        duration={4000}
+      />
+      <div className="flex gap-4 border-b border-gray-200 p-4 dark:border-neutral-800">
+        <Link href={`/${profile?.username}`}>
+          <Avatar className="h-10 w-10 shrink-0">
+            <AvatarImage src={profile?.avatar_url ?? undefined} alt="Profile" />
+            <AvatarFallback>
+              {profile?.full_name?.charAt(0).toUpperCase() ||
+                profile?.username?.charAt(0).toUpperCase() ||
+                "U"}
+            </AvatarFallback>
+          </Avatar>
+        </Link>
 
-      <div className="flex-1">
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="What's happening?"
-          className="min-h-[60px] w-full resize-none bg-transparent text-lg placeholder-gray-500 focus:outline-none"
-          rows={1}
-          onInput={(e) => {
-            const target = e.target as HTMLTextAreaElement;
-            target.style.height = "auto";
-            target.style.height = target.scrollHeight + "px";
-          }}
-        />
-        <div className="mt-4 flex items-center justify-between">
-          <span
-            className={`text-sm ${content.length > 280 ? "text-red-500" : "text-gray-500"}`}
-          >
-            {content.length}/280
-          </span>
-          <div className="flex items-center gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div
-                  className="group rounded-md p-1 hover:cursor-pointer hover:bg-gray-100"
-                  onClick={handleBotPost}
-                >
-                  <BotMessageSquare
-                    size={20}
-                    className="text-gray-500 group-hover:text-gray-700"
-                  />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Post for me</p>
-              </TooltipContent>
-            </Tooltip>
-            <button
-              onClick={handlePost}
-              disabled={!content.trim() || content.length > 280 || isPosting}
-              className="rounded-full bg-blue-500 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-600 disabled:bg-gray-400"
+        <div className="flex-1">
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="What's happening?"
+            className="min-h-[60px] w-full resize-none bg-transparent text-lg placeholder-gray-500 focus:outline-none"
+            rows={1}
+            onInput={(e) => {
+              const target = e.target as HTMLTextAreaElement;
+              target.style.height = "auto";
+              target.style.height = target.scrollHeight + "px";
+            }}
+          />
+          <div className="mt-4 flex items-center justify-between">
+            <span
+              className={`text-sm ${content.length > 280 ? "text-red-500" : "text-gray-500"}`}
             >
-              {isPosting ? "Posting..." : "Post"}
-            </button>
+              {content.length}/280
+            </span>
+            <div className="flex items-center gap-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className="group rounded-md p-1 hover:cursor-pointer hover:bg-gray-100"
+                    onClick={handleBotPost}
+                  >
+                    <BotMessageSquare
+                      size={20}
+                      className="text-gray-500 group-hover:text-gray-700"
+                    />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Post for me</p>
+                </TooltipContent>
+              </Tooltip>
+              <button
+                onClick={handlePost}
+                disabled={!content.trim() || content.length > 280 || isPosting}
+                className="rounded-full bg-blue-500 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-600 disabled:bg-gray-400"
+              >
+                {isPosting ? "Posting..." : "Post"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
