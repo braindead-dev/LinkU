@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import TimelineTabs from "@/components/TimelineTabs";
 import SearchBar from "@/components/SearchBar";
-import MessagesTab from "@/components/MessagesTab";
 import SuggestedUsers from "@/components/SuggestedUsers";
 
 export default async function Home() {
@@ -87,8 +86,6 @@ export default async function Home() {
           <SuggestedUsers currentUserId={user.id} />
         </div>
       </aside>
-
-      <MessagesTab />
     </div>
   );
 }

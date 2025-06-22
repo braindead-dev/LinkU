@@ -2,7 +2,6 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import SearchBar from "@/components/SearchBar";
-import MessagesTab from "@/components/MessagesTab";
 import SuggestedUsers from "@/components/SuggestedUsers";
 import ProfilePage from "@/components/ProfilePage";
 
@@ -44,7 +43,6 @@ export default async function Page({ params }: PageProps) {
         </div>
       </aside>
 
-      <MessagesTab />
     </div>
   );
 }

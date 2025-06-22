@@ -371,7 +371,7 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 rounded-full border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900"
+                className="flex-1 rounded-full border border-gray-300 px-4 py-2 focus:border-gray-400 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900"
               />
               <button
                 type="submit"
