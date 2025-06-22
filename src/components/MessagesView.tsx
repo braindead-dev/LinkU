@@ -271,10 +271,15 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
                   </Avatar>
                   <div className="flex-1 text-left">
                     <div className="flex items-baseline justify-between">
-                      <span className="font-semibold">
-                        {conversation.profile.full_name ||
-                          conversation.profile.username}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold">
+                          {conversation.profile.full_name ||
+                            conversation.profile.username}
+                        </span>
+                        {conversation.unreadCount > 0 && (
+                          <div className="h-2 w-2 rounded-full bg-blue-500" />
+                        )}
+                      </div>
                       {conversation.lastMessage && (
                         <span className="text-xs text-gray-500">
                           {formatTime(conversation.lastMessage.created_at)}
@@ -289,11 +294,6 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
                       </p>
                     )}
                   </div>
-                  {conversation.unreadCount > 0 && (
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 text-xs text-white">
-                      {conversation.unreadCount}
-                    </span>
-                  )}
                 </button>
               ))
             )}
