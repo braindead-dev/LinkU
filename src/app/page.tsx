@@ -4,6 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import TimelineTabs from "@/components/TimelineTabs";
 import SearchBar from "@/components/SearchBar";
 import SuggestedUsers from "@/components/SuggestedUsers";
+import { getUnreadConversationsCount } from "@/utils/unreadCount";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -70,9 +71,12 @@ export default async function Home() {
     }
   }
 
+  // Get unread conversations count
+  const unreadCount = await getUnreadConversationsCount(user.id);
+
   return (
     <div className="mx-auto flex max-w-7xl">
-      <Sidebar profile={profile} />
+      <Sidebar profile={profile} unreadCount={unreadCount} />
 
       {/* Feed */}
       <main className="min-h-screen flex-1 border-x border-gray-100 pb-24 dark:border-neutral-800">

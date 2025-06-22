@@ -19,13 +19,14 @@ type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 interface SidebarProps {
   profile: Profile | null;
+  unreadCount?: number;
 }
 
 /**
  * Sidebar – renders the left column with profile information.
  * Only visible on medium screens and up.
  */
-const Sidebar: FC<SidebarProps> = ({ profile }) => {
+const Sidebar: FC<SidebarProps> = ({ profile, unreadCount = 0 }) => {
   const router = useRouter();
   const supabase = createClient();
 
@@ -46,7 +47,20 @@ const Sidebar: FC<SidebarProps> = ({ profile }) => {
         <SidebarLink
           label="Messages"
           href="/messages"
-          icon={<MessageSquare className="h-5 w-5" />}
+          icon={
+            <div className="relative">
+              <MessageSquare className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full border-1 border-white bg-red-500 text-[10px] font-medium text-white">
+                  <span
+                    className={unreadCount > 9 ? "text-[7px]" : "text-[10px]"}
+                  >
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                </div>
+              )}
+            </div>
+          }
         />
       </nav>
       <div className="mt-auto -ml-4">
