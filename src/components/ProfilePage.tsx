@@ -28,6 +28,10 @@ type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
   followers: { count: number }[];
 };
 
+type LikeWithPost = {
+  posts: Post[];
+};
+
 type Tab = "posts" | "replies" | "likes";
 
 export default function ProfilePage({ params }: ProfilePageProps) {
@@ -170,7 +174,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
         .order("created_at", { ascending: false });
 
       if (data) {
-        const posts = data.map((item) => (item as any).posts) as Post[];
+        const posts = (data as LikeWithPost[]).flatMap((item) => item.posts);
         setLikedPosts(posts);
       }
     } catch (error) {
