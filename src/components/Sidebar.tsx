@@ -4,6 +4,7 @@ import { FC } from "react";
 import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,13 +34,15 @@ const Sidebar: FC<SidebarProps> = ({ profile }) => {
   };
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-60 gap-6 border-r border-gray-200 p-4 md:flex md:flex-col dark:border-neutral-800">
-      <ProfileSection profile={profile} onSignOut={handleSignOut} />
-      {/* Future navigation items can be added below */}
+    <aside className="sticky top-0 hidden h-screen w-60 gap-2 border-r border-gray-200 p-4 md:flex md:flex-col dark:border-neutral-800">
+      <LogoSection />
       <nav className="flex flex-col gap-4 text-lg font-medium">
         <SidebarLink label="Home" href="/" />
         <SidebarLink label="Messages" />
       </nav>
+      <div className="mt-auto">
+        <ProfileSection profile={profile} onSignOut={handleSignOut} />
+      </div>
     </aside>
   );
 };
@@ -47,6 +50,22 @@ const Sidebar: FC<SidebarProps> = ({ profile }) => {
 export default Sidebar;
 
 // Helpers
+const LogoSection: FC = () => {
+  return (
+    <div className="flex justify-start pl-1">
+      <Link href="/">
+        <Image
+          src="/logo.png"
+          alt="Logo"
+          width={75}
+          height={50}
+          className="h-auto"
+        />
+      </Link>
+    </div>
+  );
+};
+
 const ProfileSection: FC<{
   profile: Profile | null;
   onSignOut: () => void;
