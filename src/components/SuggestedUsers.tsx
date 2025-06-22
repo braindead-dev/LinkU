@@ -62,7 +62,7 @@ const SuggestedUsers: FC<SuggestedUsersProps> = ({
 
     try {
       const response = await fetch(
-        `${config.matchApiEndpoint}/api/agent_post`,
+        `${config.matchApiEndpoint}/api/match`,
         {
           method: "POST",
           headers: {

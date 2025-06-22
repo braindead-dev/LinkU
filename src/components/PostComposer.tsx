@@ -60,7 +60,7 @@ const PostComposer: FC<PostComposerProps> = ({ profile }) => {
     try {
       setShowToast(true);
 
-      const response = await fetch(`${config.matchApiEndpoint}/api/match`, {
+      const response = await fetch(`${config.matchApiEndpoint}/api/agent_post`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
