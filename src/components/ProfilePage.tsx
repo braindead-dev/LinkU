@@ -263,7 +263,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
         {profile.bio && (
           <p className="mt-2">
             {profile.bio.split(/(@\w+)/).map((part, index) => {
-              if (part.startsWith('@')) {
+              if (part.startsWith("@")) {
                 const username = part.slice(1); // Remove the @ symbol
                 return (
                   <Link

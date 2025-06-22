@@ -6,7 +6,7 @@ import Link from "next/link";
 import { FC, useState, useEffect } from "react";
 import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
-import { Heart, MessageCircle, Bot } from "lucide-react";
+import { Heart, MessageCircle, Bot, Ellipsis, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
@@ -14,6 +14,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Post = Database["public"]["Tables"]["posts"]["Row"];
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -92,6 +98,25 @@ const PostCard: FC<PostCardProps> = ({
     }
   };
 
+  const handleDelete = async () => {
+    if (!currentUserId || post.user_id !== currentUserId) return;
+
+    try {
+      const { error } = await supabase
+        .from("posts")
+        .delete()
+        .eq("id", post.id)
+        .eq("user_id", currentUserId);
+
+      if (error) throw error;
+
+      // Refresh the page or trigger a callback to remove the post from the UI
+      router.refresh();
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
+  };
+
   const handleLike = async (e: React.MouseEvent) => {
     e.stopPropagation();
 
@@ -161,7 +186,7 @@ const PostCard: FC<PostCardProps> = ({
     <article
       onClick={handlePostClick}
       className={cn(
-        "relative flex cursor-pointer gap-4 px-4 pt-4 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900/50",
+        "group relative flex cursor-pointer gap-4 px-4 pt-4 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900/50",
         !hideBorder
           ? "border-b border-gray-100 pb-4 dark:border-neutral-800"
           : "pb-0",
@@ -225,6 +250,32 @@ const PostCard: FC<PostCardProps> = ({
           <time className="text-sm text-gray-500">
             {formatDate(post.created_at)}
           </time>
+          {currentUserId === post.user_id && (
+            <div className="ml-auto opacity-0 transition-opacity group-hover:opacity-100">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    onClick={(e) => e.stopPropagation()}
+                    className="rounded-full p-1 hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-neutral-800"
+                  >
+                    <Ellipsis className="h-4 w-4 text-gray-500" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete();
+                    }}
+                    className="text-red-600 hover:cursor-pointer focus:text-red-600"
+                  >
+                    <Trash className="h-4 w-4 text-red-600" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </header>
 
         {post.parent_post_id && !hideReplyIndicator && (

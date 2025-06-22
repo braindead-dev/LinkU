@@ -5,7 +5,14 @@ import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { House, MessageSquare, User, LogOut, Bell, Settings } from "lucide-react";
+import {
+  House,
+  MessageSquare,
+  User,
+  LogOut,
+  Bell,
+  Settings,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
