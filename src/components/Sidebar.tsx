@@ -117,7 +117,7 @@ const ProfileSection: FC<{
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <span className="block truncate leading-none font-semibold">
+            <span className="mb-1 block truncate leading-none font-semibold">
               {profile.full_name || profile.username}
             </span>
             <span className="block truncate text-sm leading-none text-gray-500">
