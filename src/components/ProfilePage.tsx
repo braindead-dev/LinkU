@@ -53,7 +53,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           <h2 className="text-lg font-bold">
             {profile.full_name || profile.username}
           </h2>
-          <p className="text-md text-gray-500">{profile.posts.length} posts</p>
+          <p className="text-md text-gray-500">
+            {profile.posts.length} {profile.posts.length === 1 ? "post" : "posts"}
+          </p>
         </div>
       </header>
 
