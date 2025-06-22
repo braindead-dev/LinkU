@@ -8,6 +8,7 @@ import { MapPinIcon, CalendarIcon } from "@heroicons/react/24/outline";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Database } from "@/types/database.types";
+import Image from "next/image";
 
 type ProfilePageProps = {
   params: Promise<{
@@ -61,7 +62,17 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       </header>
 
       <div className="relative h-48 bg-gray-200 dark:bg-neutral-800">
-        {/* Placeholder for banner image */}
+        {profile.background_url ? (
+          <Image
+            src={profile.background_url}
+            alt={`${profile.username}'s background`}
+            layout="fill"
+            objectFit="cover"
+            priority
+          />
+        ) : (
+          <div className="h-full w-full bg-gray-200 dark:bg-neutral-800" />
+        )}
       </div>
 
       <div className="p-4">

@@ -15,6 +15,7 @@ export interface Database {
           username: string;
           full_name: string | null;
           avatar_url: string | null;
+          background_url: string | null;
           bio: string | null;
           location: string | null;
           core_memories: string | null;
@@ -26,6 +27,7 @@ export interface Database {
           username: string;
           full_name?: string | null;
           avatar_url?: string | null;
+          background_url?: string | null;
           bio?: string | null;
           location?: string | null;
           core_memories?: string | null;
@@ -37,6 +39,7 @@ export interface Database {
           username?: string;
           full_name?: string | null;
           avatar_url?: string | null;
+          background_url?: string | null;
           bio?: string | null;
           location?: string | null;
           core_memories?: string | null;

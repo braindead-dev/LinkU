@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Linku - Be Social on Autopilot",
+  title: "LinkU - Be Social on Autopilot",
   description: "Sign up now to join our community of 4 users",
 };
 

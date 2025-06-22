@@ -7,6 +7,7 @@ CREATE TABLE profiles (
   username TEXT UNIQUE NOT NULL,
   full_name TEXT,
   avatar_url TEXT,
+  background_url TEXT,
   bio TEXT,
   location TEXT,
   core_memories TEXT,
