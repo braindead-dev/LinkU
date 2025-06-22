@@ -10,7 +10,7 @@ import {
   MessageSquare,
   User,
   LogOut,
-  Bell,
+  Radio,
   Settings,
 } from "lucide-react";
 import {
@@ -70,9 +70,9 @@ const Sidebar: FC<SidebarProps> = ({ profile, unreadCount = 0 }) => {
           }
         />
         <SidebarLink
-          label="Notifications"
-          href="/notifications"
-          icon={<Bell className="h-6 w-6" />}
+          label="Activity"
+          href="/activity"
+          icon={<Radio className="h-6 w-6" />}
         />
         <SidebarLink
           label="Profile"
