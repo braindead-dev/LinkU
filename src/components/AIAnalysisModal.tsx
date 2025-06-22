@@ -185,9 +185,9 @@ export default function AIAnalysisModal({
               transition={{ duration: 0.2, delay: 0.2 }}
             >
               <h3 className="mb-3 text-lg font-semibold">Biography</h3>
-              <TextEffect 
-                per="char" 
-                preset="fade" 
+              <TextEffect
+                per="char"
+                preset="fade"
                 speedReveal={3}
                 className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400"
                 delay={0.2}
@@ -199,7 +199,7 @@ export default function AIAnalysisModal({
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2, delay: 0.3}}
+              transition={{ duration: 0.2, delay: 0.3 }}
             >
               <Button
                 onClick={() => {
