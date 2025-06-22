@@ -31,7 +31,7 @@ const Sidebar: FC<SidebarProps> = ({ profile }) => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push("/auth");
+    router.push("/login");
   };
 
   return (
