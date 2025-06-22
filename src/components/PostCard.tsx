@@ -8,6 +8,7 @@ import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
 import { Heart, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 type Post = Database["public"]["Tables"]["posts"]["Row"];
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -25,6 +26,7 @@ interface PostCardProps {
   };
   currentUserId?: string;
   hideReplyIndicator?: boolean;
+  hideBorder?: boolean;
 }
 
 /**
@@ -34,6 +36,7 @@ const PostCard: FC<PostCardProps> = ({
   post,
   currentUserId,
   hideReplyIndicator = false,
+  hideBorder = false,
 }) => {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -150,7 +153,12 @@ const PostCard: FC<PostCardProps> = ({
   return (
     <article
       onClick={handlePostClick}
-      className="flex cursor-pointer gap-4 border-b border-gray-100 p-4 transition-colors hover:bg-gray-50 dark:border-neutral-800 dark:hover:bg-neutral-900/50"
+      className={cn(
+        "flex cursor-pointer gap-4 px-4 pt-4 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900/50",
+        !hideBorder
+          ? "border-b border-gray-100 pb-4 dark:border-neutral-800"
+          : "pb-0",
+      )}
     >
       <Link
         href={`/${post.profiles.username}`}
@@ -209,34 +217,28 @@ const PostCard: FC<PostCardProps> = ({
         )}
 
         {/* Action buttons */}
-        <div className="mt-1 flex items-center">
-          <div className="flex w-12 items-center">
-            <button
-              onClick={handleLike}
-              className={`group -ml-1 flex items-center gap-0.5 transition-colors ${
-                liked ? "text-red-500" : "text-gray-500 hover:text-red-500"
-              }`}
-            >
-              <div className="rounded-full p-1 transition-colors group-hover:bg-red-50 dark:group-hover:bg-red-950/20">
-                <Heart
-                  className={`h-4.5 w-4.5 ${liked ? "fill-current" : ""}`}
-                />
-              </div>
-              {likeCount > 0 && <span className="text-sm">{likeCount}</span>}
-            </button>
-          </div>
+        <div className="mt-1 flex items-center gap-4 -ml-1">
+          <button
+            onClick={handleLike}
+            className={`group flex items-center transition-colors ${
+              liked ? "text-red-500" : "text-gray-500 hover:text-red-500"
+            }`}
+          >
+            <div className="rounded-full p-1 transition-colors group-hover:bg-red-50 dark:group-hover:bg-red-950/20">
+              <Heart className={`h-4 w-4 ${liked ? "fill-current" : ""}`} />
+            </div>
+            {likeCount > 0 && <span className="text-sm">{likeCount}</span>}
+          </button>
 
-          <div className="flex items-center">
-            <button
-              onClick={handleReply}
-              className="group flex items-center gap-0.5 text-gray-500 transition-colors hover:text-blue-500"
-            >
-              <div className="rounded-full p-1 transition-colors group-hover:bg-blue-50 dark:group-hover:bg-blue-950/20">
-                <MessageCircle className="h-4.5 w-4.5" />
-              </div>
-              {replyCount > 0 && <span className="text-sm">{replyCount}</span>}
-            </button>
-          </div>
+          <button
+            onClick={handleReply}
+            className="group flex items-center text-gray-500 transition-colors hover:text-blue-500"
+          >
+            <div className="rounded-full p-1 transition-colors group-hover:bg-blue-50 dark:group-hover:bg-blue-950/20">
+              <MessageCircle className="h-4 w-4" />
+            </div>
+            {replyCount > 0 && <span className="text-sm">{replyCount}</span>}
+          </button>
         </div>
       </div>
     </article>

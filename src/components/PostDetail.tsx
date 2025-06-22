@@ -10,11 +10,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type Post = Database["public"]["Tables"]["posts"]["Row"];
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+type PostWithProfile = Post & { profiles: Profile };
 
 interface PostDetailProps {
-  post: Post & {
-    profiles: Profile;
-  };
+  post: PostWithProfile;
   currentUserId: string;
   currentProfile: Profile | null;
 }
@@ -24,9 +23,11 @@ const PostDetail: FC<PostDetailProps> = ({
   currentUserId,
   currentProfile,
 }) => {
-  const [replies, setReplies] = useState<(Post & { profiles: Profile })[]>([]);
+  const [replies, setReplies] = useState<PostWithProfile[]>([]);
+  const [parentPosts, setParentPosts] = useState<PostWithProfile[]>([]);
   const [replyContent, setReplyContent] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loadingParents, setLoadingParents] = useState(true);
   const [posting, setPosting] = useState(false);
 
   const supabase = createClient();
@@ -34,7 +35,44 @@ const PostDetail: FC<PostDetailProps> = ({
 
   useEffect(() => {
     loadReplies();
-  }, [post.id]);
+    if (post.parent_post_id) {
+      loadParentThread();
+    } else {
+      setLoadingParents(false);
+    }
+  }, [post.id, post.parent_post_id]);
+
+  const loadParentThread = async () => {
+    try {
+      const parents: PostWithProfile[] = [];
+      let currentParentId = post.parent_post_id;
+
+      // Recursively load all parent posts
+      while (currentParentId) {
+        const { data: parentPost, error } = await supabase
+          .from("posts")
+          .select(
+            `
+            *,
+            profiles (*)
+          `,
+          )
+          .eq("id", currentParentId)
+          .single();
+
+        if (error || !parentPost) break;
+
+        parents.unshift(parentPost); // Add to beginning to maintain order
+        currentParentId = parentPost.parent_post_id;
+      }
+
+      setParentPosts(parents);
+    } catch (error) {
+      console.error("Error loading parent thread:", error);
+    } finally {
+      setLoadingParents(false);
+    }
+  };
 
   const loadReplies = async () => {
     try {
@@ -92,19 +130,49 @@ const PostDetail: FC<PostDetailProps> = ({
         >
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <h2 className="text-lg font-bold">Post</h2>
+        <h2 className="text-lg font-bold">Thread</h2>
       </header>
 
+      {/* Parent posts thread */}
+      {loadingParents ? (
+        <div className="p-8 text-center text-gray-500">Loading thread...</div>
+      ) : (
+        parentPosts.length > 0 && (
+          <div>
+            {parentPosts.map((parentPost) => (
+              <div key={parentPost.id} className="relative">
+                <PostCard
+                  post={parentPost}
+                  currentUserId={currentUserId}
+                  hideReplyIndicator={true}
+                  hideBorder={true}
+                />
+                {/* Thread line - extends to next post or main post */}
+                <div className="absolute left-9 top-[60px] bottom-0 w-0.5 bg-gray-300 dark:bg-neutral-700" />
+              </div>
+            ))}
+          </div>
+        )
+      )}
+
       {/* Main post */}
-      <div className="border-b border-gray-200 dark:border-neutral-800">
-        <PostCard post={post} currentUserId={currentUserId} />
+      <div className="relative">
+        {/* Thread line from parent if exists - with padding */}
+        {parentPosts.length > 0 && (
+          <div className="absolute left-9 -top-4 h-8 w-0.5 bg-gray-300 dark:bg-neutral-700" />
+        )}
+        <PostCard
+          post={post}
+          currentUserId={currentUserId}
+          hideBorder={false}
+        />
       </div>
 
       {/* Reply composer */}
       {currentProfile && (
         <form
           onSubmit={handleReply}
-          className="border-b border-gray-200 p-4 dark:border-neutral-800"
+          className="border-b border-gray-100 p-4 dark:border-neutral-800"
         >
           <div className="flex gap-3">
             <Avatar className="h-10 w-10 shrink-0">
@@ -127,23 +195,20 @@ const PostDetail: FC<PostDetailProps> = ({
                 className="ml-2 max-h-[200px] min-h-[40px] flex-1 resize-none border-none bg-transparent py-2 text-lg outline-none placeholder:text-gray-500"
                 rows={1}
               />
-
-              <div className="mt-2 flex justify-end">
-                <button
-                  type="submit"
-                  disabled={!replyContent.trim() || posting}
-                  className="rounded-full bg-blue-600 px-4 py-1.5 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {posting ? "Replying..." : "Reply"}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={!replyContent.trim() || posting}
+                className="rounded-full bg-blue-600 px-4 py-1.5 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {posting ? "Replying..." : "Reply"}
+              </button>
             </div>
           </div>
         </form>
       )}
 
       {/* Replies */}
-      <div>
+      <div className="border-t border-gray-100 dark:border-neutral-800">
         {loading ? (
           <div className="p-8 text-center text-gray-500">
             Loading replies...
@@ -153,12 +218,13 @@ const PostDetail: FC<PostDetailProps> = ({
             No replies yet. Be the first to reply!
           </div>
         ) : (
-          replies.map((reply) => (
+          replies.map((reply, index) => (
             <PostCard
               key={reply.id}
               post={reply}
               currentUserId={currentUserId}
               hideReplyIndicator={true}
+              hideBorder={index < replies.length - 1}
             />
           ))
         )}
