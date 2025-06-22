@@ -7,6 +7,7 @@ import { User } from "@supabase/supabase-js";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type Message = Database["public"]["Tables"]["user_messages"]["Row"] & {
@@ -341,7 +342,7 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
                   <p
                     className={`mt-1 text-xs ${
                       message.sender_id === currentUser.id
-                        ? "text-gray-500 text-right"
+                        ? "text-right text-gray-500"
                         : "text-gray-500"
                     }`}
                   >
@@ -377,8 +378,23 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
           </form>
         </div>
       ) : (
-        <div className="flex flex-1 items-center justify-center text-gray-500">
-          Select a conversation to start messaging
+        <div className="flex flex-1 flex-col items-center justify-center text-gray-500">
+          <Image
+            src="/square_logo.png"
+            alt="Logo"
+            width={80}
+            height={80}
+            className="mb-3 h-auto"
+          />
+          <h2 className="mb-1 text-xl font-medium text-gray-900 dark:text-gray-100">
+            Your messages
+          </h2>
+          <p className="mb-6 text-sm text-gray-600">
+            Send a message to start a chat.
+          </p>
+          <button className="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700">
+            Send message
+          </button>
         </div>
       )}
     </main>
