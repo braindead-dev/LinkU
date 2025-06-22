@@ -3,7 +3,7 @@
  */
 export const config = {
   /**
-   * API endpoint to our backend
+   * API endpoint to our backend (proxied through Vercel)
    */
-  matchApiEndpoint: "http://137.184.32.159:3000",
+  matchApiEndpoint: "/api/proxy",
 } as const;
