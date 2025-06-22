@@ -65,7 +65,7 @@ export default function CalibrationPage() {
       });
       const payload = await res.json();
 
-      let botText =
+      const botText =
         typeof payload.reply === "string"
           ? payload.reply
           : payload.error || "Oops, no response.";
@@ -85,7 +85,7 @@ export default function CalibrationPage() {
       }
 
       setMessages((prev) => [...prev, { from: "bot", text: botText }]);
-    } catch (err) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         { from: "bot", text: "Sorry, could not reach the server." },
