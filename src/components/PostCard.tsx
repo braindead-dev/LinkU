@@ -6,7 +6,7 @@ import Link from "next/link";
 import { FC, useState, useEffect } from "react";
 import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
-import { Heart, MessageCircle } from "lucide-react";
+import { Heart, MessageCircle, Bot } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -199,6 +199,9 @@ const PostCard: FC<PostCardProps> = ({
           >
             {post.profiles.full_name || post.profiles.username}
           </Link>
+          {post.is_ai_generated && (
+            <Bot className="-ml-0.5 h-4 w-4 translate-y-[1.7px] text-gray-600" />
+          )}
           <Link
             href={`/${post.profiles.username}`}
             onClick={(e) => e.stopPropagation()}
