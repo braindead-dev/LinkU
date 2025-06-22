@@ -40,97 +40,76 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Limit the number of items to analyze
+    const maxMessages = 10;
+    const maxPosts = 10;
+    const limitedMessages = messages?.slice(0, maxMessages) || [];
+    const limitedPosts = posts?.slice(0, maxPosts) || [];
+
     // Combine messages and posts into a single text for analysis
     let inputText = "AI-generated content from the past 24 hours:\n\n";
 
-    if (messages && messages.length > 0) {
+    if (limitedMessages.length > 0) {
       inputText += "MESSAGES:\n";
-      messages.forEach((msg, index) => {
-        inputText += `${index + 1}. To ${msg.recipient_name}: "${msg.content}"\n`;
+      limitedMessages.forEach((msg, index) => {
+        // Ensure content is truncated (should already be from frontend)
+        const truncatedContent = msg.content.slice(0, 150);
+        inputText += `${index + 1}. To ${msg.recipient_name}: "${truncatedContent}"\n`;
       });
       inputText += "\n";
     }
 
-    if (posts && posts.length > 0) {
+    if (limitedPosts.length > 0) {
       inputText += "POSTS:\n";
-      posts.forEach((post, index) => {
-        inputText += `${index + 1}. "${post.content}"\n`;
+      limitedPosts.forEach((post, index) => {
+        // Ensure content is truncated (should already be from frontend)
+        const truncatedContent = post.content.slice(0, 150);
+        inputText += `${index + 1}. "${truncatedContent}"\n`;
       });
     }
 
-    const response = await openai.responses.create({
-      model: "gpt-4.1",
-      input: [
+    // Limit total input text length as a safety measure
+    if (inputText.length > 3000) {
+      inputText = inputText.slice(0, 3000) + "...\n[Content truncated]";
+    }
+
+    console.log("Input text length:", inputText.length);
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
         {
           role: "system",
-          content: [
-            {
-              type: "input_text",
-              text: 'Your job is to return the name of someone the user had a standout / highlight conversation with from the messages (ex. "Karthik"), and also give a short super summary of what they talked about (ex. "You discussed startup insights and Lebron James with a potential founder").\n\nAlso, give a short overall summary of all the user interactions from the ones provided (ex. "You had 3 conversations today about AI and Calhacks and argued with 2 people in comment sections")\n\nIf there are no meaningful interactions, return empty strings for highlighted_person and brief_summary, and a simple summary for overall_summary.',
-            },
-          ],
+          content: 'Your job is to analyze AI-generated content and provide:\n1. The name of someone the user had a standout/highlight conversation with (if any)\n2. A brief summary of what they talked about\n3. An overall summary of all AI interactions\n\nRespond in JSON format with keys: highlighted_person, brief_summary, overall_summary'
         },
         {
           role: "user",
-          content: [
-            {
-              type: "input_text",
-              text: inputText,
-            },
-          ],
-        },
+          content: inputText
+        }
       ],
-      text: {
-        format: {
-          type: "json_schema",
-          name: "highlight_conversations",
-          strict: true,
-          schema: {
-            type: "object",
-            properties: {
-              highlighted_person: {
-                type: "string",
-                description:
-                  "The name of the person involved in a standout conversation.",
-              },
-              brief_summary: {
-                type: "string",
-                description:
-                  "A short summary of what was discussed in the standout conversation.",
-              },
-              overall_summary: {
-                type: "string",
-                description:
-                  "A short overall summary of all user interactions based on provided messages.",
-              },
-            },
-            required: [
-              "highlighted_person",
-              "brief_summary",
-              "overall_summary",
-            ],
-            additionalProperties: false,
-          },
-        },
-      },
-      reasoning: {},
-      tools: [],
-      temperature: 1,
-      max_output_tokens: 2048,
-      top_p: 1,
-      store: true,
+      response_format: { type: "json_object" },
+      temperature: 0.7,
+      max_tokens: 500,
     });
 
-    console.log(
-      "OpenAI AI Activity Response:",
-      JSON.stringify(response, null, 2),
-    );
-    console.log("Response output_text:", response.output_text);
+    console.log("OpenAI response received");
 
-    const analysis = JSON.parse(response.output_text || "{}");
+    const content = response.choices[0]?.message?.content;
+    if (!content) {
+      throw new Error("No content in OpenAI response");
+    }
+
+    const analysis = JSON.parse(content);
     console.log("Parsed AI activity analysis:", analysis);
 
-    return NextResponse.json(analysis);
+    // Ensure all required fields exist
+    const result = {
+      highlighted_person: analysis.highlighted_person || "",
+      brief_summary: analysis.brief_summary || "",
+      overall_summary: analysis.overall_summary || "Summary of your AI interactions today.",
+    };
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error analyzing AI activity:", error);
     console.error("Error details:", {
@@ -138,9 +117,12 @@ export async function POST(req: NextRequest) {
       message: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : "No stack trace",
     });
-    return NextResponse.json(
-      { error: "Failed to analyze AI activity" },
-      { status: 500 },
-    );
+    
+    // Return a default response instead of erroring out
+    return NextResponse.json({
+      highlighted_person: "",
+      brief_summary: "",
+      overall_summary: "Unable to generate AI activity summary at this time.",
+    });
   }
 }

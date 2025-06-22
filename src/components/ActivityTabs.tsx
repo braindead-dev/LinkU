@@ -102,6 +102,14 @@ const ActivityHeader: FC<{
 );
 
 /**
+ * Helper function to truncate text with ellipses
+ */
+const truncateText = (text: string, maxLength: number = 280): string => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trim() + "...";
+};
+
+/**
  * ActivityContent – renders the content below the header
  */
 const ActivityContent: FC<{
@@ -109,9 +117,13 @@ const ActivityContent: FC<{
   postContent?: string;
 }> = ({ content, postContent }) => (
   <>
-    {content && <p className="text-sm text-gray-600">{content}</p>}
+    {content && (
+      <p className="text-sm text-gray-600">{truncateText(content)}</p>
+    )}
     {postContent && (
-      <p className="text-sm text-gray-600">&ldquo;{postContent}&rdquo;</p>
+      <p className="text-sm text-gray-600">
+        &ldquo;{truncateText(postContent)}&rdquo;
+      </p>
     )}
   </>
 );
@@ -522,7 +534,8 @@ const ActivityTabs: FC<ActivityTabsProps> = () => {
         .eq("sender_id", userId)
         .eq("is_ai_generated", true)
         .gte("created_at", twentyFourHoursAgo.toISOString())
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(10); // Limit to 10 most recent messages
 
       if (messagesError) {
         console.error("Error fetching AI messages:", messagesError);
@@ -535,7 +548,8 @@ const ActivityTabs: FC<ActivityTabsProps> = () => {
         .eq("user_id", userId)
         .eq("is_ai_generated", true)
         .gte("created_at", twentyFourHoursAgo.toISOString())
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(10); // Limit to 10 most recent posts
 
       if (postsError) {
         console.error("Error fetching AI posts:", postsError);
@@ -552,12 +566,12 @@ const ActivityTabs: FC<ActivityTabsProps> = () => {
         return [];
       }
 
-      // Prepare data for OpenAI analysis
-      const messagesForAnalysis = (aiMessages || []).map((msg: unknown) => {
+      // Prepare data for OpenAI analysis - truncate content to reduce token usage
+      const messagesForAnalysis = (aiMessages || []).slice(0, 10).map((msg: unknown) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const msgData = msg as any;
         return {
-          content: msgData.content,
+          content: truncateText(msgData.content, 150), // Truncate to 150 chars
           recipient_name:
             msgData.profiles?.full_name ||
             msgData.profiles?.username ||
@@ -566,11 +580,11 @@ const ActivityTabs: FC<ActivityTabsProps> = () => {
         };
       });
 
-      const postsForAnalysis = (aiPosts || []).map((post: unknown) => {
+      const postsForAnalysis = (aiPosts || []).slice(0, 10).map((post: unknown) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const postData = post as any;
         return {
-          content: postData.content,
+          content: truncateText(postData.content, 150), // Truncate to 150 chars
           created_at: postData.created_at,
         };
       });
