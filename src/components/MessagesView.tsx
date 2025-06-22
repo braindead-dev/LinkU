@@ -337,37 +337,51 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
             </header>
 
             <div className="flex-1 overflow-y-auto p-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`mb-4 flex ${
-                    message.sender_id === currentUser.id
-                      ? "justify-end"
-                      : "justify-start"
-                  }`}
-                >
-                  <div className="flex flex-col">
-                    <div
-                      className={`max-w-xs rounded-full px-4 py-1.5 ${
-                        message.sender_id === currentUser.id
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-100 dark:bg-neutral-800"
-                      }`}
-                    >
-                      <p className="break-words">{message.content}</p>
+              {messages.map((message, index) => {
+                const nextMessage = messages[index + 1];
+                const currentTime = new Date(message.created_at).getTime();
+                const nextTime = nextMessage
+                  ? new Date(nextMessage.created_at).getTime()
+                  : null;
+                const isWithinHour =
+                  nextTime && nextTime - currentTime < 60 * 60 * 1000;
+
+                return (
+                  <div
+                    key={message.id}
+                    className={`mb-1 flex ${
+                      message.sender_id === currentUser.id
+                        ? "justify-end"
+                        : "justify-start"
+                    } transition-all`}
+                  >
+                    <div className="group flex flex-col">
+                      <div
+                        className={`max-w-xs cursor-default rounded-full px-4 py-1.5 ${
+                          message.sender_id === currentUser.id
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-100 dark:bg-neutral-800"
+                        }`}
+                      >
+                        <p className="break-words">{message.content}</p>
+                      </div>
+                      <p
+                        className={`cursor-default text-xs transition-all ${
+                          message.sender_id === currentUser.id
+                            ? "text-right text-gray-500"
+                            : "text-gray-500"
+                        } ${
+                          isWithinHour
+                            ? "h-0 opacity-0 group-hover:mt-1 group-hover:h-auto group-hover:opacity-100"
+                            : "mt-1 h-auto opacity-100"
+                        }`}
+                      >
+                        {formatTime(message.created_at)}
+                      </p>
                     </div>
-                    <p
-                      className={`mt-1 text-xs ${
-                        message.sender_id === currentUser.id
-                          ? "text-right text-gray-500"
-                          : "text-gray-500"
-                      }`}
-                    >
-                      {formatTime(message.created_at)}
-                    </p>
                   </div>
-                </div>
-              ))}
+                );
+              })}
               <div ref={messagesEndRef} />
             </div>
 
