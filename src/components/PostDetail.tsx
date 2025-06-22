@@ -161,6 +161,7 @@ const PostDetail: FC<PostDetailProps> = ({
           currentUserId={currentUserId}
           hideBorder={replies.length > 0}
           threadLine={parentPosts.length > 0 ? "up" : "none"}
+          hideReplyIndicator={true}
         />
       </div>
 
