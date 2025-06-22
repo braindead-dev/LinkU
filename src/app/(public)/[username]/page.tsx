@@ -42,7 +42,6 @@ export default async function Page({ params }: PageProps) {
           <SuggestedUsers currentUserId={user.id} />
         </div>
       </aside>
-
     </div>
   );
 }

@@ -303,25 +303,30 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
         {/* Messages thread */}
         {selectedConversation ? (
           <div className="flex flex-1 flex-col">
-            <header className="flex items-center gap-3 border-b border-gray-200 p-4 dark:border-neutral-800">
-              <Avatar className="h-10 w-10">
-                <AvatarImage
-                  src={selectedConversation.avatar_url ?? undefined}
-                />
-                <AvatarFallback>
-                  {selectedConversation.full_name?.charAt(0) ||
-                    selectedConversation.username.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h2 className="font-semibold">
-                  {selectedConversation.full_name ||
-                    selectedConversation.username}
-                </h2>
-                <p className="text-xs text-neutral-600">
-                  {selectedConversation.username}
-                </p>
-              </div>
+            <header className="flex items-center border-b border-gray-200 p-4 dark:border-neutral-800">
+              <button
+                onClick={() => router.push(`/${selectedConversation.username}`)}
+                className="flex items-center gap-3 hover:cursor-pointer"
+              >
+                <Avatar className="h-10 w-10">
+                  <AvatarImage
+                    src={selectedConversation.avatar_url ?? undefined}
+                  />
+                  <AvatarFallback>
+                    {selectedConversation.full_name?.charAt(0) ||
+                      selectedConversation.username.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="text-left">
+                  <h2 className="font-semibold">
+                    {selectedConversation.full_name ||
+                      selectedConversation.username}
+                  </h2>
+                  <p className="text-xs text-neutral-600">
+                    {selectedConversation.username}
+                  </p>
+                </div>
+              </button>
             </header>
 
             <div className="flex-1 overflow-y-auto p-4">
