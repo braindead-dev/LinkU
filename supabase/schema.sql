@@ -9,6 +9,7 @@ CREATE TABLE profiles (
   avatar_url TEXT,
   bio TEXT,
   location TEXT,
+  core_memories TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
