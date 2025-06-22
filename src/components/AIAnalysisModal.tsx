@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { TextEffect } from "@/components/ui/text-effect";
+import { TextShimmer } from "@/components/ui/text-shimmer";
 import { Database } from "@/types/database.types";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
@@ -132,7 +133,9 @@ export default function AIAnalysisModal({
 
         {loading && (
           <div className="flex h-64 items-center justify-center">
-            <p>Analyzing...</p>
+            <TextShimmer className="text-md font-mono" duration={1}>
+              Analyzing...
+            </TextShimmer>
           </div>
         )}
 
