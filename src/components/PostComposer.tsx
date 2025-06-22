@@ -5,6 +5,13 @@ import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { BotMessageSquare } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { config } from "@/lib/config";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -42,6 +49,39 @@ const PostComposer: FC<PostComposerProps> = ({ profile }) => {
     }
   };
 
+  const handleBotPost = async () => {
+    if (!profile?.core_memories) {
+      console.error("No core memories available");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${config.matchApiEndpoint}/api/match`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: profile.id,
+          agent_id: profile.agent_id,
+          core_memories: profile.core_memories,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("Bot post request successful:", result);
+
+      // Optionally refresh the page or update the UI
+      router.refresh();
+    } catch (error) {
+      console.error("Error sending bot post request:", error);
+    }
+  };
+
   return (
     <div className="flex gap-4 border-b border-gray-200 p-4 dark:border-neutral-800">
       <Link href={`/${profile?.username}`}>
@@ -74,13 +114,31 @@ const PostComposer: FC<PostComposerProps> = ({ profile }) => {
           >
             {content.length}/280
           </span>
-          <button
-            onClick={handlePost}
-            disabled={!content.trim() || content.length > 280 || isPosting}
-            className="rounded-full bg-blue-500 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-600 disabled:bg-gray-400"
-          >
-            {isPosting ? "Posting..." : "Post"}
-          </button>
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div
+                  className="group rounded-md p-1 hover:cursor-pointer hover:bg-gray-100"
+                  onClick={handleBotPost}
+                >
+                  <BotMessageSquare
+                    size={20}
+                    className="text-gray-500 group-hover:text-gray-700"
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Post for me</p>
+              </TooltipContent>
+            </Tooltip>
+            <button
+              onClick={handlePost}
+              disabled={!content.trim() || content.length > 280 || isPosting}
+              className="rounded-full bg-blue-500 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-600 disabled:bg-gray-400"
+            >
+              {isPosting ? "Posting..." : "Post"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

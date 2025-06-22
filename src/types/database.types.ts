@@ -19,6 +19,7 @@ export interface Database {
           bio: string | null;
           location: string | null;
           core_memories: string | null;
+          agent_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -31,6 +32,7 @@ export interface Database {
           bio?: string | null;
           location?: string | null;
           core_memories?: string | null;
+          agent_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -43,6 +45,7 @@ export interface Database {
           bio?: string | null;
           location?: string | null;
           core_memories?: string | null;
+          agent_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };

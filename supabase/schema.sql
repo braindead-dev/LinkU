@@ -11,6 +11,7 @@ CREATE TABLE profiles (
   bio TEXT,
   location TEXT,
   core_memories TEXT,
+  agent_id TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
