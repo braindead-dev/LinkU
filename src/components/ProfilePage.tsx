@@ -1,4 +1,7 @@
-import { createClient } from "@/utils/supabase/server";
+"use client";
+
+import { useState, useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
 import { notFound } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import PostCard from "@/components/PostCard";
@@ -20,26 +23,171 @@ type Post = Database["public"]["Tables"]["posts"]["Row"] & {
   profiles: Database["public"]["Tables"]["profiles"]["Row"];
 };
 
-export default async function ProfilePage({ params }: ProfilePageProps) {
-  const supabase = await createClient();
-  const { username } = await params;
+type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
+  following: { count: number }[];
+  followers: { count: number }[];
+};
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select(
-      "*, posts(*, profiles(*)), following:following!follower_id(count), followers:following!following_id(count)",
-    )
-    .eq("username", username)
-    .single();
+type Tab = "posts" | "replies" | "likes";
 
-  if (!profile) {
-    notFound();
+export default function ProfilePage({ params }: ProfilePageProps) {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [replies, setReplies] = useState<Post[]>([]);
+  const [likedPosts, setLikedPosts] = useState<Post[]>([]);
+  const [activeTab, setActiveTab] = useState<Tab>("posts");
+  const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>(
+    undefined,
+  );
+  const [username, setUsername] = useState<string>("");
+
+  const supabase = createClient();
+
+  useEffect(() => {
+    const loadParams = async () => {
+      const { username } = await params;
+      setUsername(username);
+    };
+    loadParams();
+  }, [params]);
+
+  useEffect(() => {
+    if (username) {
+      loadProfile();
+      checkCurrentUser();
+    }
+  }, [username]);
+
+  useEffect(() => {
+    if (profile) {
+      if (activeTab === "posts") {
+        loadPosts();
+      } else if (activeTab === "replies") {
+        loadReplies();
+      } else if (activeTab === "likes") {
+        loadLikedPosts();
+      }
+    }
+  }, [profile, activeTab]);
+
+  const checkCurrentUser = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    setCurrentUserId(user?.id || undefined);
+  };
+
+  const loadProfile = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select(
+          `
+          *,
+          following:following!follower_id(count),
+          followers:following!following_id(count)
+        `,
+        )
+        .eq("username", username)
+        .single();
+
+      if (error || !data) {
+        notFound();
+        return;
+      }
+
+      setProfile(data as Profile);
+    } catch (error) {
+      console.error("Error loading profile:", error);
+      notFound();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadPosts = async () => {
+    if (!profile) return;
+
+    try {
+      const { data } = await supabase
+        .from("posts")
+        .select(
+          `
+          *,
+          profiles (*)
+        `,
+        )
+        .eq("user_id", profile.id)
+        .is("parent_post_id", null)
+        .order("created_at", { ascending: false });
+
+      setPosts(data || []);
+    } catch (error) {
+      console.error("Error loading posts:", error);
+    }
+  };
+
+  const loadReplies = async () => {
+    if (!profile) return;
+
+    try {
+      const { data } = await supabase
+        .from("posts")
+        .select(
+          `
+          *,
+          profiles (*)
+        `,
+        )
+        .eq("user_id", profile.id)
+        .not("parent_post_id", "is", null)
+        .order("created_at", { ascending: false });
+
+      setReplies(data || []);
+    } catch (error) {
+      console.error("Error loading replies:", error);
+    }
+  };
+
+  const loadLikedPosts = async () => {
+    if (!profile) return;
+
+    try {
+      const { data } = await supabase
+        .from("likes")
+        .select(
+          `
+          post_id,
+          posts!inner (
+            *,
+            profiles (*)
+          )
+        `,
+        )
+        .eq("user_id", profile.id)
+        .order("created_at", { ascending: false });
+
+      if (data) {
+        const posts = data.map((item) => (item as any).posts) as Post[];
+        setLikedPosts(posts);
+      }
+    } catch (error) {
+      console.error("Error loading liked posts:", error);
+    }
+  };
+
+  if (loading || !profile) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const isOwnProfile = user?.id === profile.id;
+  const isOwnProfile = currentUserId === profile.id;
+  const postCount = posts.length + replies.length;
 
   return (
     <div>
@@ -55,8 +203,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             {profile.full_name || profile.username}
           </h2>
           <p className="text-md text-gray-500">
-            {profile.posts.length}{" "}
-            {profile.posts.length === 1 ? "post" : "posts"}
+            {postCount} {postCount === 1 ? "post" : "posts"}
           </p>
         </div>
       </header>
@@ -96,7 +243,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             ) : (
               <>
                 <MessageButton user={profile} />
-                <FollowButton user={profile} currentUserId={user?.id} />
+                <FollowButton user={profile} currentUserId={currentUserId} />
               </>
             )}
           </div>
@@ -132,44 +279,95 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
         <div className="mt-2 flex gap-4 text-sm">
           <p>
-            <span className="font-bold">{profile.following[0].count}</span>{" "}
+            <span className="font-bold">
+              {profile.following[0]?.count || 0}
+            </span>{" "}
             Following
           </p>
           <p>
-            <span className="font-bold">{profile.followers[0].count}</span>{" "}
+            <span className="font-bold">
+              {profile.followers[0]?.count || 0}
+            </span>{" "}
             Followers
           </p>
         </div>
       </div>
 
       <div className="border-b border-gray-200 dark:border-neutral-800">
-        {/* Tabs for Posts, Replies, Likes */}
         <nav className="flex justify-around">
-          <button className="flex-1 border-b-2 border-blue-500 p-4 font-bold">
+          <button
+            onClick={() => setActiveTab("posts")}
+            className={`flex-1 p-4 transition-colors ${
+              activeTab === "posts"
+                ? "border-b-2 border-blue-500 font-bold"
+                : "text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800"
+            }`}
+          >
             Posts
           </button>
-          <button className="flex-1 p-4 text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800">
+          <button
+            onClick={() => setActiveTab("replies")}
+            className={`flex-1 p-4 transition-colors ${
+              activeTab === "replies"
+                ? "border-b-2 border-blue-500 font-bold"
+                : "text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800"
+            }`}
+          >
             Replies
           </button>
-          <button className="flex-1 p-4 text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800">
+          <button
+            onClick={() => setActiveTab("likes")}
+            className={`flex-1 p-4 transition-colors ${
+              activeTab === "likes"
+                ? "border-b-2 border-blue-500 font-bold"
+                : "text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800"
+            }`}
+          >
             Likes
           </button>
         </nav>
       </div>
 
       <div className="pb-28">
-        {profile.posts
-          .sort(
-            (a: Post, b: Post) =>
-              new Date(b.created_at).getTime() -
-              new Date(a.created_at).getTime(),
-          )
-          .map((post: Post) => (
-            <PostCard
-              key={post.id}
-              post={{ ...post, profiles: profile }}
-              currentUserId={user?.id}
-            />
+        {activeTab === "posts" &&
+          (posts.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">No posts yet</div>
+          ) : (
+            posts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                currentUserId={currentUserId || undefined}
+              />
+            ))
+          ))}
+
+        {activeTab === "replies" &&
+          (replies.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">No replies yet</div>
+          ) : (
+            replies.map((reply) => (
+              <PostCard
+                key={reply.id}
+                post={reply}
+                currentUserId={currentUserId || undefined}
+              />
+            ))
+          ))}
+
+        {activeTab === "likes" &&
+          (likedPosts.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              No liked posts yet
+            </div>
+          ) : (
+            likedPosts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                currentUserId={currentUserId || undefined}
+              />
+            ))
           ))}
       </div>
     </div>
