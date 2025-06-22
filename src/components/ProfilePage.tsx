@@ -12,6 +12,11 @@ import { ArrowLeft, BrainCircuit } from "lucide-react";
 import Link from "next/link";
 import { Database } from "@/types/database.types";
 import Image from "next/image";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type ProfilePageProps = {
   params: Promise<{
@@ -256,9 +261,16 @@ export default function ProfilePage({ params }: ProfilePageProps) {
         <div className="mt-4">
           <h1 className="flex items-center gap-2 text-2xl font-bold">
             {profile.full_name || profile.username}
-            <div className="translate-y-0.5 rounded-lg border-1 border-neutral-200 bg-neutral-100 p-1 hover:cursor-pointer dark:border-neutral-700 dark:bg-neutral-800">
-              <BrainCircuit className="h-5 w-5 text-neutral-600" />
-            </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="translate-y-0.5 rounded-lg border-1 border-neutral-200 bg-neutral-100 p-1 hover:cursor-pointer dark:border-neutral-700 dark:bg-neutral-800">
+                  <BrainCircuit className="h-5 w-5 text-neutral-600" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>AI Analysis</p>
+              </TooltipContent>
+            </Tooltip>
           </h1>
           <p className="text-gray-500">@{profile.username}</p>
         </div>
