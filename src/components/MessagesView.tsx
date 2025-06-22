@@ -299,7 +299,7 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
                       )}
                     </div>
                     {conversation.lastMessage && (
-                      <p className="truncate text-sm text-gray-500 max-w-[200px] overflow-hidden whitespace-nowrap">
+                      <p className="max-w-[200px] truncate overflow-hidden text-sm whitespace-nowrap text-gray-500">
                         {conversation.lastMessage.sender_id ===
                           currentUser.id && "You: "}
                         {conversation.lastMessage.content}
