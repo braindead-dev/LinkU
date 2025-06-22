@@ -114,25 +114,26 @@ const PostDetail: FC<PostDetailProps> = ({
                   currentProfile.username.charAt(0)}
               </AvatarFallback>
             </Avatar>
-
-            <div className="flex-1">
+            <div className="flex flex-1 items-center gap-3">
               <textarea
                 value={replyContent}
-                onChange={(e) => setReplyContent(e.target.value)}
+                onChange={(e) => {
+                  setReplyContent(e.target.value);
+                  // Auto-adjust height
+                  e.target.style.height = "auto";
+                  e.target.style.height = e.target.scrollHeight + "px";
+                }}
                 placeholder="Post your reply"
-                className="w-full resize-none border-none bg-transparent p-2 text-lg outline-none placeholder:text-gray-500"
-                rows={3}
+                className="ml-2 max-h-[200px] min-h-[40px] flex-1 resize-none border-none bg-transparent py-2 text-lg outline-none placeholder:text-gray-500"
+                rows={1}
               />
-
-              <div className="mt-2 flex justify-end">
-                <button
-                  type="submit"
-                  disabled={!replyContent.trim() || posting}
-                  className="rounded-full bg-blue-600 px-4 py-1.5 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {posting ? "Replying..." : "Reply"}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={!replyContent.trim() || posting}
+                className="rounded-full bg-blue-600 px-4 py-1.5 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {posting ? "Replying..." : "Reply"}
+              </button>
             </div>
           </div>
         </form>
