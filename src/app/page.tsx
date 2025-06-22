@@ -76,7 +76,7 @@ export default async function Home() {
       <Sidebar profile={profile} />
 
       {/* Feed */}
-      <main className="min-h-screen flex-1 border-x border-gray-200 dark:border-neutral-800">
+      <main className="min-h-screen flex-1 border-x border-gray-200 pb-24 dark:border-neutral-800">
         <TimelineTabs profile={profile} />
       </main>
 

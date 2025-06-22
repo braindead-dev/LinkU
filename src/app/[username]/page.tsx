@@ -7,9 +7,9 @@ import SuggestedUsers from "@/components/SuggestedUsers";
 import ProfilePage from "@/components/ProfilePage";
 
 type PageProps = {
-  params: {
+  params: Promise<{
     username: string;
-  };
+  }>;
 };
 
 export default async function Page({ params }: PageProps) {
@@ -34,7 +34,7 @@ export default async function Page({ params }: PageProps) {
       <Sidebar profile={profile} />
 
       <main className="min-h-screen flex-1 border-x border-gray-200 dark:border-neutral-800">
-        <ProfilePage params={Promise.resolve(params)} />
+        <ProfilePage params={params} />
       </main>
 
       <aside className="hidden w-96 space-y-4 xl:block">
