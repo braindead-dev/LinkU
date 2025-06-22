@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Send } from "lucide-react";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
@@ -97,7 +98,7 @@ const NewMessageDialog: FC<NewMessageDialogProps> = ({
           </div>
         </div>
 
-        <div className="max-h-96 overflow-y-auto">
+        <div className="mb-2 max-h-96 overflow-y-auto">
           {loading ? (
             <div className="p-4 text-center text-gray-500">Loading...</div>
           ) : filteredUsers.length === 0 ? (
@@ -115,7 +116,7 @@ const NewMessageDialog: FC<NewMessageDialogProps> = ({
                 <button
                   key={user.id}
                   onClick={() => handleUserSelect(user)}
-                  className="flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900"
+                  className="group flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900"
                 >
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={user.avatar_url ?? undefined} />
@@ -129,20 +130,11 @@ const NewMessageDialog: FC<NewMessageDialogProps> = ({
                     </p>
                     <p className="text-sm text-gray-500">@{user.username}</p>
                   </div>
-                  <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
+                  <Send className="mr-1 h-5 w-5 text-gray-500 transition-colors group-hover:text-gray-700" />
                 </button>
               ))}
             </>
           )}
-        </div>
-
-        <div className="border-t p-4">
-          <button
-            disabled={filteredUsers.length === 0}
-            className="w-full rounded-lg bg-blue-500 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-300"
-          >
-            Chat
-          </button>
         </div>
       </DialogContent>
     </Dialog>
