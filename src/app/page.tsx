@@ -71,6 +71,11 @@ export default async function Home() {
     }
   }
 
+
+  if (profile && !profile.agent_id) {
+    redirect(`/calibration?userId=${profile.id}`);
+  }
+  
   // Get unread conversations count
   const unreadCount = await getUnreadConversationsCount(user.id);
 
