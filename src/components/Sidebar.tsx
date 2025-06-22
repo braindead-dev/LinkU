@@ -5,7 +5,7 @@ import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { House, MessageSquare, User, LogOut } from "lucide-react";
+import { House, MessageSquare, User, LogOut, Bell } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,6 +61,16 @@ const Sidebar: FC<SidebarProps> = ({ profile, unreadCount = 0 }) => {
               )}
             </div>
           }
+        />
+        <SidebarLink
+          label="Notifications"
+          href="/notifications"
+          icon={<Bell className="h-6 w-6" />}
+        />
+        <SidebarLink
+          label="Profile"
+          href={`/${profile?.username}`}
+          icon={<User className="h-6 w-6" />}
         />
       </nav>
       <div className="mt-auto -ml-4">
