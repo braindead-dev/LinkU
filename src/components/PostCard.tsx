@@ -9,6 +9,11 @@ import { createClient } from "@/utils/supabase/client";
 import { Heart, MessageCircle, Bot } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type Post = Database["public"]["Tables"]["posts"]["Row"];
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
@@ -200,7 +205,14 @@ const PostCard: FC<PostCardProps> = ({
             {post.profiles.full_name || post.profiles.username}
           </Link>
           {post.is_ai_generated && (
-            <Bot className="-ml-0.5 h-4 w-4 translate-y-[1.7px] text-gray-600" />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Bot className="-ml-0.5 h-4 w-4 translate-y-[1.7px] text-gray-600" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>AI generated content</p>
+              </TooltipContent>
+            </Tooltip>
           )}
           <Link
             href={`/${post.profiles.username}`}
