@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -124,9 +125,9 @@ export function SignupForm({
               </div>
               <div className="text-center text-sm">
                 Already have an account?{" "}
-                <a href="/login" className="underline underline-offset-4">
+                <Link href="/login" className="underline underline-offset-4">
                   Login
-                </a>
+                </Link>
               </div>
             </div>
           </form>
