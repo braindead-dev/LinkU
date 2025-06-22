@@ -4,37 +4,37 @@ const BACKEND_URL = 'http://137.184.32.159:3000';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: { path: string[] } }
 ) {
-  return handleProxyRequest(request, params.path, 'GET');
+  return handleProxyRequest(request, context.params.path, 'GET');
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: { path: string[] } }
 ) {
-  return handleProxyRequest(request, params.path, 'POST');
+  return handleProxyRequest(request, context.params.path, 'POST');
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: { path: string[] } }
 ) {
-  return handleProxyRequest(request, params.path, 'PUT');
+  return handleProxyRequest(request, context.params.path, 'PUT');
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: { path: string[] } }
 ) {
-  return handleProxyRequest(request, params.path, 'DELETE');
+  return handleProxyRequest(request, context.params.path, 'DELETE');
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: { path: string[] } }
 ) {
-  return handleProxyRequest(request, params.path, 'PATCH');
+  return handleProxyRequest(request, context.params.path, 'PATCH');
 }
 
 async function handleProxyRequest(
@@ -65,7 +65,7 @@ async function handleProxyRequest(
     if (method !== 'GET' && method !== 'HEAD') {
       try {
         body = await request.text();
-      } catch (error) {
+      } catch {
         // No body to read
       }
     }
