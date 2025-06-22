@@ -61,19 +61,16 @@ const SuggestedUsers: FC<SuggestedUsersProps> = ({
     }
 
     try {
-      const response = await fetch(
-        `${config.matchApiEndpoint}/api/match`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: currentProfile.id,
-            agent_id: currentProfile.agent_id,
-          }),
+      const response = await fetch(`${config.matchApiEndpoint}/api/match`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          id: currentProfile.id,
+          agent_id: currentProfile.agent_id,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

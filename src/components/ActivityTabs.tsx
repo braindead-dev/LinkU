@@ -567,27 +567,31 @@ const ActivityTabs: FC<ActivityTabsProps> = () => {
       }
 
       // Prepare data for OpenAI analysis - truncate content to reduce token usage
-      const messagesForAnalysis = (aiMessages || []).slice(0, 10).map((msg: unknown) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const msgData = msg as any;
-        return {
-          content: truncateText(msgData.content, 150), // Truncate to 150 chars
-          recipient_name:
-            msgData.profiles?.full_name ||
-            msgData.profiles?.username ||
-            "Unknown",
-          created_at: msgData.created_at,
-        };
-      });
+      const messagesForAnalysis = (aiMessages || [])
+        .slice(0, 10)
+        .map((msg: unknown) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const msgData = msg as any;
+          return {
+            content: truncateText(msgData.content, 150), // Truncate to 150 chars
+            recipient_name:
+              msgData.profiles?.full_name ||
+              msgData.profiles?.username ||
+              "Unknown",
+            created_at: msgData.created_at,
+          };
+        });
 
-      const postsForAnalysis = (aiPosts || []).slice(0, 10).map((post: unknown) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const postData = post as any;
-        return {
-          content: truncateText(postData.content, 150), // Truncate to 150 chars
-          created_at: postData.created_at,
-        };
-      });
+      const postsForAnalysis = (aiPosts || [])
+        .slice(0, 10)
+        .map((post: unknown) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const postData = post as any;
+          return {
+            content: truncateText(postData.content, 150), // Truncate to 150 chars
+            created_at: postData.created_at,
+          };
+        });
 
       // Call OpenAI API to generate summaries
       const response = await fetch("/api/ai-activity", {

@@ -80,12 +80,13 @@ export async function POST(req: NextRequest) {
       messages: [
         {
           role: "system",
-          content: 'Your job is to analyze AI-generated content and provide:\n1. The name of someone the user had a standout/highlight conversation with (if any)\n2. A brief summary of what they talked about\n3. An overall summary of all AI interactions\n\nRespond in JSON format with keys: highlighted_person, brief_summary, overall_summary'
+          content:
+            "Your job is to analyze AI-generated content and provide:\n1. The name of someone the user had a standout/highlight conversation with (if any)\n2. A brief summary of what they talked about\n3. An overall summary of all AI interactions\n\nRespond in JSON format with keys: highlighted_person, brief_summary, overall_summary",
         },
         {
           role: "user",
-          content: inputText
-        }
+          content: inputText,
+        },
       ],
       response_format: { type: "json_object" },
       temperature: 0.7,
@@ -106,7 +107,8 @@ export async function POST(req: NextRequest) {
     const result = {
       highlighted_person: analysis.highlighted_person || "",
       brief_summary: analysis.brief_summary || "",
-      overall_summary: analysis.overall_summary || "Summary of your AI interactions today.",
+      overall_summary:
+        analysis.overall_summary || "Summary of your AI interactions today.",
     };
 
     return NextResponse.json(result);
@@ -117,7 +119,7 @@ export async function POST(req: NextRequest) {
       message: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : "No stack trace",
     });
-    
+
     // Return a default response instead of erroring out
     return NextResponse.json({
       highlighted_person: "",

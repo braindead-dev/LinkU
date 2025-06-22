@@ -60,17 +60,20 @@ const PostComposer: FC<PostComposerProps> = ({ profile }) => {
     try {
       setShowToast(true);
 
-      const response = await fetch(`${config.matchApiEndpoint}/api/agent_post`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${config.matchApiEndpoint}/api/agent_post`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: profile.id,
+            agent_id: profile.agent_id,
+            core_memories: profile.core_memories,
+          }),
         },
-        body: JSON.stringify({
-          id: profile.id,
-          agent_id: profile.agent_id,
-          core_memories: profile.core_memories,
-        }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

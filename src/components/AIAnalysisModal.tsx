@@ -12,6 +12,9 @@ import { TextEffect } from "@/components/ui/text-effect";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { motion } from "motion/react";
 import { Database } from "@/types/database.types";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
+import { config } from "@/lib/config";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
   core_memories?: string | null;
@@ -40,7 +43,10 @@ export default function AIAnalysisModal({
 }: AIAnalysisModalProps) {
   const [analysis, setAnalysis] = useState<ProfileAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
 
   useEffect(() => {
     if (isOpen && profile?.core_memories && !analysis && !loading) {
@@ -76,6 +82,57 @@ export default function AIAnalysisModal({
       );
     }
   }, [isOpen, profile, analysis, loading]);
+
+  const handleReachOut = async () => {
+    if (!profile?.id) return;
+
+    setSendingMessage(true);
+    setError(null);
+
+    try {
+      // Get current user
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("You must be logged in to send messages");
+      }
+
+      // Send message through the proxy endpoint
+      const response = await fetch(
+        `${config.matchApiEndpoint}/api/send_message`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            sender_id: user.id,
+            recipient_id: profile.id,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to send message");
+      }
+
+      const data = await response.json();
+      console.log("Message sent successfully:", data);
+
+      // Close the modal
+      onOpenChange(false);
+
+      // Redirect to messages page
+      router.push("/messages");
+    } catch (err) {
+      console.error("Error sending message:", err);
+      setError(err instanceof Error ? err.message : "Failed to send message");
+    } finally {
+      setSendingMessage(false);
+    }
+  };
 
   if (!profile) return null;
 
@@ -122,6 +179,7 @@ export default function AIAnalysisModal({
         if (!open) {
           setAnalysis(null);
           setError(null);
+          setSendingMessage(false);
         }
       }}
     >
@@ -140,13 +198,21 @@ export default function AIAnalysisModal({
           </div>
         )}
 
-        {error && !loading && (
+        {sendingMessage && (
+          <div className="flex h-64 items-center justify-center">
+            <TextShimmer className="text-md font-mono" duration={1}>
+              Working...
+            </TextShimmer>
+          </div>
+        )}
+
+        {error && !loading && !sendingMessage && (
           <div className="flex h-64 items-center justify-center text-center">
             <p className="text-neutral-500">{error}</p>
           </div>
         )}
 
-        {!loading && !error && analysis && (
+        {!loading && !sendingMessage && !error && analysis && (
           <div className="space-y-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -202,9 +268,7 @@ export default function AIAnalysisModal({
               transition={{ duration: 0.2, delay: 0.3 }}
             >
               <Button
-                onClick={() => {
-                  onOpenChange(false);
-                }}
+                onClick={handleReachOut}
                 className="w-full border-2 border-neutral-600 bg-neutral-900 text-white hover:cursor-pointer hover:bg-neutral-800"
                 size="lg"
               >
