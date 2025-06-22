@@ -39,6 +39,8 @@ interface ActivityItem {
   // Navigation data
   post_id?: string;
   parent_post_id?: string;
+  // AI-specific data
+  highlighted_person?: string;
 }
 
 /**
@@ -196,7 +198,8 @@ const ActivityCard: FC<{ item: ActivityItem; activeTab: Tab }> = ({
   const getContent = () => {
     switch (item.type) {
       case "bot_conversation":
-        return renderBotActivity("New conversation with Karthik");
+        const personName = item.highlighted_person || "someone";
+        return renderBotActivity(`New conversation with ${personName}`);
 
       case "bot_summary":
         return renderBotActivity("AI Interaction Summary");
@@ -495,24 +498,134 @@ const ActivityTabs: FC<ActivityTabsProps> = () => {
     }
   };
 
-  // Generate dummy bot activities (keep these for now)
-  const generateBotActivities = (): ActivityItem[] => [
-    {
-      id: "bot-1",
-      type: "bot_conversation",
-      content:
-        "You discussed startup insights and Lebron James with a potential founder",
-      timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-      read: false,
-    },
-    {
-      id: "bot-2",
-      type: "bot_summary",
-      content: "You had 3 conversations today about AI and Calhacks",
-      timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-      read: true,
-    },
-  ];
+  // Fetch AI-generated activities (replaces generateBotActivities)
+  const fetchAIActivities = async (userId: string): Promise<ActivityItem[]> => {
+    try {
+      // Get date from 24 hours ago
+      const twentyFourHoursAgo = new Date();
+      twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
+
+      // Fetch AI-generated messages from the past 24 hours
+      const { data: aiMessages, error: messagesError } = await supabase
+        .from("user_messages")
+        .select(
+          `
+          id,
+          content,
+          created_at,
+          profiles!recipient_id(
+            username,
+            full_name
+          )
+        `,
+        )
+        .eq("sender_id", userId)
+        .eq("is_ai_generated", true)
+        .gte("created_at", twentyFourHoursAgo.toISOString())
+        .order("created_at", { ascending: false });
+
+      if (messagesError) {
+        console.error("Error fetching AI messages:", messagesError);
+      }
+
+      // Fetch AI-generated posts from the past 24 hours
+      const { data: aiPosts, error: postsError } = await supabase
+        .from("posts")
+        .select("id, content, created_at")
+        .eq("user_id", userId)
+        .eq("is_ai_generated", true)
+        .gte("created_at", twentyFourHoursAgo.toISOString())
+        .order("created_at", { ascending: false });
+
+      if (postsError) {
+        console.error("Error fetching AI posts:", postsError);
+      }
+
+      console.log("AI Messages found:", aiMessages?.length || 0);
+      console.log("AI Posts found:", aiPosts?.length || 0);
+
+      // If no AI content, return empty array
+      if (
+        (!aiMessages || aiMessages.length === 0) &&
+        (!aiPosts || aiPosts.length === 0)
+      ) {
+        return [];
+      }
+
+      // Prepare data for OpenAI analysis
+      const messagesForAnalysis = (aiMessages || []).map((msg: unknown) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const msgData = msg as any;
+        return {
+          content: msgData.content,
+          recipient_name:
+            msgData.profiles?.full_name ||
+            msgData.profiles?.username ||
+            "Unknown",
+          created_at: msgData.created_at,
+        };
+      });
+
+      const postsForAnalysis = (aiPosts || []).map((post: unknown) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const postData = post as any;
+        return {
+          content: postData.content,
+          created_at: postData.created_at,
+        };
+      });
+
+      // Call OpenAI API to generate summaries
+      const response = await fetch("/api/ai-activity", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: messagesForAnalysis,
+          posts: postsForAnalysis,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("Failed to get AI activity analysis");
+        return [];
+      }
+
+      const analysis = await response.json();
+      console.log("AI Activity Analysis:", analysis);
+
+      const activities: ActivityItem[] = [];
+
+      // Create "New conversation" notification if there's a highlighted person
+      if (analysis.highlighted_person && analysis.brief_summary) {
+        activities.push({
+          id: "ai-conversation-1",
+          type: "bot_conversation",
+          content: analysis.brief_summary,
+          highlighted_person: analysis.highlighted_person,
+          timestamp: new Date().toISOString(), // Use current time for the notification
+          read: false,
+        });
+      }
+
+      // Create "AI Interaction Summary" notification
+      if (analysis.overall_summary) {
+        activities.push({
+          id: "ai-summary-1",
+          type: "bot_summary",
+          content: analysis.overall_summary,
+          timestamp: new Date().toISOString(), // Use current time for the notification
+          read: false,
+        });
+      }
+
+      return activities;
+    } catch (error) {
+      console.error("Error fetching AI activities:", error);
+      return [];
+    }
+  };
 
   // Load all activities
   useEffect(() => {
@@ -553,14 +666,16 @@ const ActivityTabs: FC<ActivityTabsProps> = () => {
           replies.length,
         );
 
-        // Combine with bot activities
-        const botActivities = generateBotActivities();
+        // Fetch AI-generated activities
+        const aiActivities = await fetchAIActivities(currentUserId);
+
+        // Combine with other activities
         const allActivities = [
           ...likes,
           ...follows,
           ...messages,
           ...replies,
-          ...botActivities,
+          ...aiActivities,
         ];
 
         // Sort by timestamp
