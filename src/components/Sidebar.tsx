@@ -45,6 +45,7 @@ const Sidebar: FC<SidebarProps> = ({ profile }) => {
         />
         <SidebarLink
           label="Messages"
+          href="/messages"
           icon={<MessageSquare className="h-5 w-5" />}
         />
       </nav>

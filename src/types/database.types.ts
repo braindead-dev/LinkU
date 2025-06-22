@@ -90,7 +90,7 @@ export interface Database {
           created_at?: string;
         };
       };
-      messages: {
+      user_messages: {
         Row: {
           id: string;
           sender_id: string;

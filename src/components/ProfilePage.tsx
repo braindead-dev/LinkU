@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import PostCard from "@/components/PostCard";
 import FollowButton from "@/components/FollowButton";
+import MessageButton from "@/components/MessageButton";
 import { MapPinIcon, CalendarIcon } from "@heroicons/react/24/outline";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -70,13 +71,18 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               </AvatarFallback>
             </Avatar>
           </div>
-          {isOwnProfile ? (
-            <button className="rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold transition-colors hover:bg-gray-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
-              Edit profile
-            </button>
-          ) : (
-            <FollowButton user={profile} currentUserId={user?.id} />
-          )}
+          <div className="flex gap-2">
+            {isOwnProfile ? (
+              <button className="rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold transition-colors hover:bg-gray-100 dark:border-neutral-700 dark:hover:bg-neutral-800">
+                Edit profile
+              </button>
+            ) : (
+              <>
+                <MessageButton user={profile} />
+                <FollowButton user={profile} currentUserId={user?.id} />
+              </>
+            )}
+          </div>
         </div>
 
         <div className="mt-4">

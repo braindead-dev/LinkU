@@ -35,7 +35,7 @@ CREATE TABLE following (
 );
 
 -- Create messages table
-CREATE TABLE messages (
+CREATE TABLE user_messages (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   sender_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   recipient_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
@@ -49,15 +49,15 @@ CREATE INDEX idx_posts_user_id ON posts(user_id);
 CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
 CREATE INDEX idx_following_follower_id ON following(follower_id);
 CREATE INDEX idx_following_following_id ON following(following_id);
-CREATE INDEX idx_messages_sender_id ON messages(sender_id);
-CREATE INDEX idx_messages_recipient_id ON messages(recipient_id);
-CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
+CREATE INDEX idx_messages_sender_id ON user_messages(sender_id);
+CREATE INDEX idx_messages_recipient_id ON user_messages(recipient_id);
+CREATE INDEX idx_messages_created_at ON user_messages(created_at DESC);
 
 -- Enable Row Level Security
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE following ENABLE ROW LEVEL SECURITY;
-ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_messages ENABLE ROW LEVEL SECURITY;
 
 -- Profiles policies
 CREATE POLICY "Public profiles are viewable by everyone" ON profiles
@@ -93,10 +93,10 @@ CREATE POLICY "Users can unfollow" ON following
   FOR DELETE USING (auth.uid() = follower_id);
 
 -- Messages policies
-CREATE POLICY "Users can view own messages" ON messages
+CREATE POLICY "Users can view own messages" ON user_messages
   FOR SELECT USING (auth.uid() = sender_id OR auth.uid() = recipient_id);
 
-CREATE POLICY "Users can send messages" ON messages
+CREATE POLICY "Users can send messages" ON user_messages
   FOR INSERT WITH CHECK (auth.uid() = sender_id);
 
 -- Function to handle new user creation
