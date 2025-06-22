@@ -151,12 +151,19 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
 
       setMessages(data || []);
 
-      // Mark messages as read
-      await supabase
+      // Mark messages as read - only messages sent BY the other user TO the current user
+      const { data: updatedMessages, error: updateError } = await supabase
         .from("user_messages")
         .update({ read: true })
+        .eq("sender_id", otherUserId)
         .eq("recipient_id", currentUser.id)
-        .eq("sender_id", otherUserId);
+        .eq("read", false)
+        .select();
+
+      if (!updateError && updatedMessages && updatedMessages.length > 0) {
+        // Reload conversations to update the unread count
+        await loadConversations();
+      }
     } catch (error) {
       console.error("Error loading messages:", error);
     }
