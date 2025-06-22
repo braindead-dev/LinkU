@@ -1,5 +1,6 @@
 "use client";
 import { FC, useEffect, useState } from "react";
+import Image from "next/image";
 import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
 import UserCard from "./UserCard";
@@ -56,7 +57,17 @@ const SuggestedUsers: FC<SuggestedUsersProps> = ({ currentUserId }) => {
 
   return (
     <div className="overflow-hidden rounded-2xl bg-gray-50 dark:bg-neutral-900">
-      <h2 className="p-4 pb-0 text-xl font-bold">Who to follow</h2>
+      <div className="flex items-center justify-between p-4 pb-0">
+        <h2 className="text-xl font-bold">Who to follow</h2>
+        <div className="rounded-lg bg-white p-1 shadow-sm transition-colors duration-100 hover:cursor-pointer hover:bg-gray-50">
+          <Image
+            src="/square_logo.png"
+            alt="Linku Logo"
+            width={20}
+            height={20}
+          />
+        </div>
+      </div>
       <div className="py-2">
         {users.map((user) => (
           <UserCard key={user.id} user={user} currentUserId={currentUserId} />
