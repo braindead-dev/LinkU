@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Database } from "@/types/database.types";
 
-type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+type Profile = Database["public"]["Tables"]["profiles"]["Row"] & {
+  post_frequency_per_day?: number | null;
+  connect_frequency_per_day?: number | null;
+};
 
 interface SettingsFormProps {
   profile: Profile;
