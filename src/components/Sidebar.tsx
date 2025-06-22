@@ -5,7 +5,7 @@ import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { House, MessageSquare, User, LogOut, Bell } from "lucide-react";
+import { House, MessageSquare, User, LogOut, Bell, Settings } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -131,6 +131,12 @@ const ProfileSection: FC<{
           <Link href={`/${profile.username}`}>
             <User className="h-4 w-4 text-black" />
             Profile
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/settings">
+            <Settings className="h-4 w-4 text-black" />
+            Settings
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={onSignOut}>
