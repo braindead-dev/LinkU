@@ -55,7 +55,10 @@ export default async function Page({ params }: PageProps) {
       <aside className="hidden w-96 space-y-4 xl:block">
         <SearchBar />
         <div className="px-4">
-          <SuggestedUsers currentUserId={user?.id} />
+          <SuggestedUsers
+            currentUserId={user?.id}
+            currentProfile={currentUserProfile}
+          />
         </div>
       </aside>
     </div>
