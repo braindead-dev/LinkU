@@ -312,8 +312,8 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
                 {selectedConversation.full_name ||
                   selectedConversation.username}
               </h2>
-              <p className="text-sm text-gray-500">
-                @{selectedConversation.username}
+              <p className="text-xs text-neutral-600">
+                {selectedConversation.username}
               </p>
             </div>
           </header>
@@ -328,18 +328,20 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
                     : "justify-start"
                 }`}
               >
-                <div
-                  className={`max-w-xs rounded-2xl px-4 py-2 ${
-                    message.sender_id === currentUser.id
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-100 dark:bg-neutral-800"
-                  }`}
-                >
-                  <p className="break-words">{message.content}</p>
+                <div className="flex flex-col">
+                  <div
+                    className={`max-w-xs rounded-full px-4 py-1.5 ${
+                      message.sender_id === currentUser.id
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-100 dark:bg-neutral-800"
+                    }`}
+                  >
+                    <p className="break-words">{message.content}</p>
+                  </div>
                   <p
                     className={`mt-1 text-xs ${
                       message.sender_id === currentUser.id
-                        ? "text-blue-100"
+                        ? "text-gray-500 text-right"
                         : "text-gray-500"
                     }`}
                   >

@@ -21,7 +21,7 @@ export default async function MessagesPage() {
     .single();
 
   return (
-    <div className="mx-auto flex max-w-7xl">
+    <div className="flex md:pl-4 lg:pl-8 xl:pl-20">
       <Sidebar profile={profile} />
       <MessagesView currentUser={user} />
     </div>
