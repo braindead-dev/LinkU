@@ -5,10 +5,15 @@ import { Database } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send } from "lucide-react";
+import { Send, Bot } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import NewMessageDialog from "@/components/NewMessageDialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type Message = Database["public"]["Tables"]["user_messages"]["Row"] & {
@@ -355,34 +360,46 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
                         : "justify-start"
                     } transition-all`}
                   >
-                    <div className="group flex flex-col">
-                      <div
-                        className={`max-w-xs cursor-default px-4 py-1.5 ${
-                          message.sender_id === currentUser.id
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-100 dark:bg-neutral-800"
-                        } ${
-                          message.content.includes(" ") ||
-                          message.content.length > 40
-                            ? "rounded-xl"
-                            : "rounded-full"
-                        }`}
-                      >
-                        <p className="break-words">{message.content}</p>
+                    <div className="group flex items-start gap-3">
+                      {message.is_ai_generated && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Bot className="h-5 w-5 flex-shrink-0 translate-y-1.5 text-gray-500" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>AI generated content</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                      <div className="flex flex-col">
+                        <div
+                          className={`max-w-xs cursor-default px-4 py-1.5 ${
+                            message.sender_id === currentUser.id
+                              ? "bg-blue-500 text-white"
+                              : "bg-gray-100 dark:bg-neutral-800"
+                          } ${
+                            message.content.includes(" ") ||
+                            message.content.length > 40
+                              ? "rounded-xl"
+                              : "rounded-full"
+                          }`}
+                        >
+                          <p className="break-words">{message.content}</p>
+                        </div>
+                        <p
+                          className={`cursor-default text-xs transition-all ${
+                            message.sender_id === currentUser.id
+                              ? "text-right text-gray-500"
+                              : "text-gray-500"
+                          } ${
+                            isWithinHour
+                              ? "h-0 opacity-0 group-hover:mt-1 group-hover:h-auto group-hover:opacity-100"
+                              : "mt-1 h-auto opacity-100"
+                          }`}
+                        >
+                          {formatTime(message.created_at)}
+                        </p>
                       </div>
-                      <p
-                        className={`cursor-default text-xs transition-all ${
-                          message.sender_id === currentUser.id
-                            ? "text-right text-gray-500"
-                            : "text-gray-500"
-                        } ${
-                          isWithinHour
-                            ? "h-0 opacity-0 group-hover:mt-1 group-hover:h-auto group-hover:opacity-100"
-                            : "mt-1 h-auto opacity-100"
-                        }`}
-                      >
-                        {formatTime(message.created_at)}
-                      </p>
                     </div>
                   </div>
                 );
