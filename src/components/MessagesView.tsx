@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
+import NewMessageDialog from "@/components/NewMessageDialog";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type Message = Database["public"]["Tables"]["user_messages"]["Row"] & {
@@ -33,6 +34,7 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [newMessageDialogOpen, setNewMessageDialogOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
   const router = useRouter();
@@ -231,173 +233,185 @@ const MessagesView: FC<MessagesViewProps> = ({ currentUser }) => {
   };
 
   return (
-    <main className="flex h-screen flex-1">
-      {/* Conversations list */}
-      <div className="w-80 border-r border-gray-200 dark:border-neutral-800">
-        <header className="border-b border-gray-200 p-4 dark:border-neutral-800">
-          <h1 className="text-xl font-bold">Messages</h1>
-        </header>
-        <div className="overflow-y-auto">
-          {loading ? (
-            <div className="p-4 text-center text-gray-500">
-              Loading conversations...
-            </div>
-          ) : conversations.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
-              No conversations yet
-            </div>
-          ) : (
-            conversations.map((conversation) => (
-              <button
-                key={conversation.profile.id}
-                onClick={() => setSelectedConversation(conversation.profile)}
-                className={`flex w-full items-center gap-3 p-4 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900 ${
-                  selectedConversation?.id === conversation.profile.id
-                    ? "bg-gray-50 dark:bg-neutral-900"
-                    : ""
-                }`}
-              >
-                <Avatar className="h-12 w-12">
-                  <AvatarImage
-                    src={conversation.profile.avatar_url ?? undefined}
-                  />
-                  <AvatarFallback>
-                    {conversation.profile.full_name?.charAt(0) ||
-                      conversation.profile.username.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 text-left">
-                  <div className="flex items-baseline justify-between">
-                    <span className="font-semibold">
-                      {conversation.profile.full_name ||
-                        conversation.profile.username}
-                    </span>
-                    {conversation.lastMessage && (
-                      <span className="text-xs text-gray-500">
-                        {formatTime(conversation.lastMessage.created_at)}
+    <>
+      <main className="flex h-screen flex-1">
+        {/* Conversations list */}
+        <div className="w-80 border-r border-gray-200 dark:border-neutral-800">
+          <header className="border-b border-gray-200 p-4 dark:border-neutral-800">
+            <h1 className="text-xl font-bold">Messages</h1>
+          </header>
+          <div className="overflow-y-auto">
+            {loading ? (
+              <div className="p-4 text-center text-gray-500">
+                Loading conversations...
+              </div>
+            ) : conversations.length === 0 ? (
+              <div className="p-4 text-center text-gray-500">
+                No conversations yet
+              </div>
+            ) : (
+              conversations.map((conversation) => (
+                <button
+                  key={conversation.profile.id}
+                  onClick={() => setSelectedConversation(conversation.profile)}
+                  className={`flex w-full items-center gap-3 p-4 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900 ${
+                    selectedConversation?.id === conversation.profile.id
+                      ? "bg-gray-50 dark:bg-neutral-900"
+                      : ""
+                  }`}
+                >
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage
+                      src={conversation.profile.avatar_url ?? undefined}
+                    />
+                    <AvatarFallback>
+                      {conversation.profile.full_name?.charAt(0) ||
+                        conversation.profile.username.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 text-left">
+                    <div className="flex items-baseline justify-between">
+                      <span className="font-semibold">
+                        {conversation.profile.full_name ||
+                          conversation.profile.username}
                       </span>
+                      {conversation.lastMessage && (
+                        <span className="text-xs text-gray-500">
+                          {formatTime(conversation.lastMessage.created_at)}
+                        </span>
+                      )}
+                    </div>
+                    {conversation.lastMessage && (
+                      <p className="truncate text-sm text-gray-500">
+                        {conversation.lastMessage.sender_id ===
+                          currentUser.id && "You: "}
+                        {conversation.lastMessage.content}
+                      </p>
                     )}
                   </div>
-                  {conversation.lastMessage && (
-                    <p className="truncate text-sm text-gray-500">
-                      {conversation.lastMessage.sender_id === currentUser.id &&
-                        "You: "}
-                      {conversation.lastMessage.content}
-                    </p>
+                  {conversation.unreadCount > 0 && (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 text-xs text-white">
+                      {conversation.unreadCount}
+                    </span>
                   )}
-                </div>
-                {conversation.unreadCount > 0 && (
-                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 text-xs text-white">
-                    {conversation.unreadCount}
-                  </span>
-                )}
-              </button>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Messages thread */}
-      {selectedConversation ? (
-        <div className="flex flex-1 flex-col">
-          <header className="flex items-center gap-3 border-b border-gray-200 p-4 dark:border-neutral-800">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={selectedConversation.avatar_url ?? undefined} />
-              <AvatarFallback>
-                {selectedConversation.full_name?.charAt(0) ||
-                  selectedConversation.username.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h2 className="font-semibold">
-                {selectedConversation.full_name ||
-                  selectedConversation.username}
-              </h2>
-              <p className="text-xs text-neutral-600">
-                {selectedConversation.username}
-              </p>
-            </div>
-          </header>
-
-          <div className="flex-1 overflow-y-auto p-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`mb-4 flex ${
-                  message.sender_id === currentUser.id
-                    ? "justify-end"
-                    : "justify-start"
-                }`}
-              >
-                <div className="flex flex-col">
-                  <div
-                    className={`max-w-xs rounded-full px-4 py-1.5 ${
-                      message.sender_id === currentUser.id
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-100 dark:bg-neutral-800"
-                    }`}
-                  >
-                    <p className="break-words">{message.content}</p>
-                  </div>
-                  <p
-                    className={`mt-1 text-xs ${
-                      message.sender_id === currentUser.id
-                        ? "text-right text-gray-500"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    {formatTime(message.created_at)}
-                  </p>
-                </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
+                </button>
+              ))
+            )}
           </div>
+        </div>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              sendMessage();
-            }}
-            className="flex items-center gap-2 border-t border-gray-200 p-4 dark:border-neutral-800"
-          >
-            <input
-              type="text"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message..."
-              className="flex-1 rounded-full border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900"
-            />
-            <button
-              type="submit"
-              disabled={!newMessage.trim() || sendingMessage}
-              className="rounded-full bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-400"
+        {/* Messages thread */}
+        {selectedConversation ? (
+          <div className="flex flex-1 flex-col">
+            <header className="flex items-center gap-3 border-b border-gray-200 p-4 dark:border-neutral-800">
+              <Avatar className="h-10 w-10">
+                <AvatarImage
+                  src={selectedConversation.avatar_url ?? undefined}
+                />
+                <AvatarFallback>
+                  {selectedConversation.full_name?.charAt(0) ||
+                    selectedConversation.username.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <h2 className="font-semibold">
+                  {selectedConversation.full_name ||
+                    selectedConversation.username}
+                </h2>
+                <p className="text-xs text-neutral-600">
+                  {selectedConversation.username}
+                </p>
+              </div>
+            </header>
+
+            <div className="flex-1 overflow-y-auto p-4">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`mb-4 flex ${
+                    message.sender_id === currentUser.id
+                      ? "justify-end"
+                      : "justify-start"
+                  }`}
+                >
+                  <div className="flex flex-col">
+                    <div
+                      className={`max-w-xs rounded-full px-4 py-1.5 ${
+                        message.sender_id === currentUser.id
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-100 dark:bg-neutral-800"
+                      }`}
+                    >
+                      <p className="break-words">{message.content}</p>
+                    </div>
+                    <p
+                      className={`mt-1 text-xs ${
+                        message.sender_id === currentUser.id
+                          ? "text-right text-gray-500"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      {formatTime(message.created_at)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                sendMessage();
+              }}
+              className="flex items-center gap-2 border-t border-gray-200 p-4 dark:border-neutral-800"
             >
-              <Send className="h-5 w-5" />
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type a message..."
+                className="flex-1 rounded-full border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900"
+              />
+              <button
+                type="submit"
+                disabled={!newMessage.trim() || sendingMessage}
+                className="rounded-full bg-blue-500 p-2 text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-gray-400"
+              >
+                <Send className="h-5 w-5" />
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="flex flex-1 flex-col items-center justify-center text-gray-500">
+            <Image
+              src="/square_logo.png"
+              alt="Logo"
+              width={80}
+              height={80}
+              className="mb-3 h-auto"
+            />
+            <h2 className="mb-1 text-xl font-medium text-gray-900 dark:text-gray-100">
+              Your messages
+            </h2>
+            <p className="mb-6 text-sm text-gray-600">
+              Send a message to start a chat.
+            </p>
+            <button
+              onClick={() => setNewMessageDialogOpen(true)}
+              className="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+            >
+              Send message
             </button>
-          </form>
-        </div>
-      ) : (
-        <div className="flex flex-1 flex-col items-center justify-center text-gray-500">
-          <Image
-            src="/square_logo.png"
-            alt="Logo"
-            width={80}
-            height={80}
-            className="mb-3 h-auto"
-          />
-          <h2 className="mb-1 text-xl font-medium text-gray-900 dark:text-gray-100">
-            Your messages
-          </h2>
-          <p className="mb-6 text-sm text-gray-600">
-            Send a message to start a chat.
-          </p>
-          <button className="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700">
-            Send message
-          </button>
-        </div>
-      )}
-    </main>
+          </div>
+        )}
+      </main>
+      <NewMessageDialog
+        open={newMessageDialogOpen}
+        onOpenChange={setNewMessageDialogOpen}
+        currentUserId={currentUser.id}
+      />
+    </>
   );
 };
 
