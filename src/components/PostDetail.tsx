@@ -139,16 +139,15 @@ const PostDetail: FC<PostDetailProps> = ({
       ) : (
         parentPosts.length > 0 && (
           <div>
-            {parentPosts.map((parentPost) => (
-              <div key={parentPost.id} className="relative">
+            {parentPosts.map((parentPost, index) => (
+              <div key={parentPost.id}>
                 <PostCard
                   post={parentPost}
                   currentUserId={currentUserId}
                   hideReplyIndicator={true}
                   hideBorder={true}
+                  threadLine={index === 0 ? "down" : "both"}
                 />
-                {/* Thread line - extends to next post or main post */}
-                <div className="absolute top-[60px] bottom-0 left-9 w-0.5 bg-gray-300 dark:bg-neutral-700" />
               </div>
             ))}
           </div>
@@ -156,15 +155,12 @@ const PostDetail: FC<PostDetailProps> = ({
       )}
 
       {/* Main post */}
-      <div className="relative">
-        {/* Thread line from parent if exists - with padding */}
-        {parentPosts.length > 0 && (
-          <div className="absolute -top-4 left-9 h-8 w-0.5 bg-gray-300 dark:bg-neutral-700" />
-        )}
+      <div>
         <PostCard
           post={post}
           currentUserId={currentUserId}
-          hideBorder={false}
+          hideBorder={replies.length > 0}
+          threadLine={parentPosts.length > 0 ? "up" : "none"}
         />
       </div>
 
@@ -187,7 +183,6 @@ const PostDetail: FC<PostDetailProps> = ({
                 value={replyContent}
                 onChange={(e) => {
                   setReplyContent(e.target.value);
-                  // Auto-adjust height
                   e.target.style.height = "auto";
                   e.target.style.height = e.target.scrollHeight + "px";
                 }}
@@ -208,14 +203,10 @@ const PostDetail: FC<PostDetailProps> = ({
       )}
 
       {/* Replies */}
-      <div className="border-t border-gray-100 dark:border-neutral-800">
+      <div>
         {loading ? (
           <div className="p-8 text-center text-gray-500">
             Loading replies...
-          </div>
-        ) : replies.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            No replies yet. Be the first to reply!
           </div>
         ) : (
           replies.map((reply, index) => (
@@ -225,6 +216,7 @@ const PostDetail: FC<PostDetailProps> = ({
               currentUserId={currentUserId}
               hideReplyIndicator={true}
               hideBorder={index < replies.length - 1}
+              threadLine="none"
             />
           ))
         )}

@@ -27,6 +27,7 @@ interface PostCardProps {
   currentUserId?: string;
   hideReplyIndicator?: boolean;
   hideBorder?: boolean;
+  threadLine?: "none" | "up" | "down" | "both";
 }
 
 /**
@@ -37,6 +38,7 @@ const PostCard: FC<PostCardProps> = ({
   currentUserId,
   hideReplyIndicator = false,
   hideBorder = false,
+  threadLine = "none",
 }) => {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -154,12 +156,24 @@ const PostCard: FC<PostCardProps> = ({
     <article
       onClick={handlePostClick}
       className={cn(
-        "flex cursor-pointer gap-4 px-4 pt-4 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900/50",
+        "relative flex cursor-pointer gap-4 px-4 pt-4 transition-colors hover:bg-gray-50 dark:hover:bg-neutral-900/50",
         !hideBorder
           ? "border-b border-gray-100 pb-4 dark:border-neutral-800"
           : "pb-0",
       )}
     >
+      {/* Thread lines */}
+      {threadLine !== "none" && (
+        <>
+          {(threadLine === "up" || threadLine === "both") && (
+            <div className="absolute top-0 left-9 h-4 w-0.5 bg-gray-200 dark:bg-neutral-800" />
+          )}
+          {(threadLine === "down" || threadLine === "both") && (
+            <div className="absolute top-14 bottom-0 left-9 w-0.5 bg-gray-200 dark:bg-neutral-800" />
+          )}
+        </>
+      )}
+
       <Link
         href={`/${post.profiles.username}`}
         onClick={(e) => e.stopPropagation()}
